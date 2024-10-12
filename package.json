@@ -1,0 +1,19 @@
+{
+  "name": "servicesync",
+  "version": "1.0.0",
+  "description": "ServiceSync Web Application for CSC 190 &amp; CSC191",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-Best-Effort/ServiceSync.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Team-Best-Effort/ServiceSync/issues"
+  },
+  "homepage": "https://github.com/Team-Best-Effort/ServiceSync#readme"
+}
