@@ -6,6 +6,6 @@ const AdminCalendar = () => {
             <h1>Admin Calendar</h1>
         </div>
     );
-};
+}
 
 export default AdminCalendar;
