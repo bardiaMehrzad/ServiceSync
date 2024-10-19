@@ -33,6 +33,24 @@ const AdminHome = () => {
                             <span>Assigned to: Jeff</span>
                             <span>9/28/24 9:00AM</span>
                         </div>
+                        <div className="job-item">
+                            <span>Repairs</span>
+                            <span>1045 Random St</span>
+                            <span>Assigned to: N/A</span>
+                            <span>9/28/24 11:00AM</span>
+                        </div>
+                        <div className="job-item">
+                            <span>Installation</span>
+                            <span>1045 Random St</span>
+                            <span>Assigned to: Nick</span>
+                            <span>9/30/24 2:00PM</span>
+                        </div>
+                        <div className="job-item">
+                            <span>Plumbing</span>
+                            <span>1235 Random St</span>
+                            <span>Assigned to: Tyler</span>
+                            <span>10/30/24 12:00PM</span>
+                        </div>
                     </div>
                 </div>
                 <div className="payroll-button">
