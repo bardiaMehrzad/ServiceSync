@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Team-Best-Effort/ServiceSync/issues"
   },
-  "homepage": "https://github.com/Team-Best-Effort/ServiceSync#readme"
+  "homepage": "https://github.com/Team-Best-Effort/ServiceSync#readme",
+  "dependencies": {
+    "react-router-dom": "^6.27.0"
+  }
 }
