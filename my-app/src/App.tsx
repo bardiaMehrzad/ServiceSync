@@ -8,7 +8,8 @@ import {
 import DefaultHome from "./pages/DefaultHome";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
-import './App.css'; 
+import AdminPayroll from "./pages/AdminPayroll";
+import './App.css';
 
 function App() {
   return (
@@ -23,12 +24,16 @@ function App() {
         <Link to="/AdminHome">
           <button className="nav-button">Admin Home</button>
         </Link>
+        <Link to="/AdminPayroll">
+          <button className="nav-button">Admin Payroll</button>
+        </Link>
       </div>
 
       <Routes>
         <Route path="/" element={<DefaultHome />} />
         <Route path="/AdminCalendar" element={<AdminCalendar />} />
         <Route path="/AdminHome" element={<AdminHome />} />
+        <Route path="/AdminPayroll" element={<AdminPayroll />} />
       </Routes>
     </Router>
   );
