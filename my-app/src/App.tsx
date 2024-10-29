@@ -9,8 +9,8 @@ import DefaultHome from "./pages/DefaultHome";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
 import AdminPayroll from "./pages/AdminPayroll";
+import LoginPage from "./pages/LoginPage";
 import './App.css';
-
 function App() {
   return (
     <Router>
@@ -27,6 +27,9 @@ function App() {
         <Link to="/AdminPayroll">
           <button className="nav-button">Admin Payroll</button>
         </Link>
+        <Link to="/LoginPage">
+          <button className="nav-button">login page</button>
+        </Link>
       </div>
 
       <Routes>
@@ -34,6 +37,7 @@ function App() {
         <Route path="/AdminCalendar" element={<AdminCalendar />} />
         <Route path="/AdminHome" element={<AdminHome />} />
         <Route path="/AdminPayroll" element={<AdminPayroll />} />
+        <Route path="/LoginPage" element={<LoginPage />} />
       </Routes>
     </Router>
   );
