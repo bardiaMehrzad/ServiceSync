@@ -8,6 +8,7 @@ import {
 import DefaultHome from "./pages/DefaultHome";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
+import LoginPage from "./pages/LoginPage";
 import './App.css'; 
 
 function App() {
@@ -23,12 +24,17 @@ function App() {
         <Link to="/AdminHome">
           <button className="nav-button">Admin Home</button>
         </Link>
+        <Link to="/LoginPage">
+          <button className="nav-button">login page</button>
+        </Link>
       </div>
 
       <Routes>
         <Route path="/" element={<DefaultHome />} />
+        <Route path="/LoginPage" element={<LoginPage />} />
         <Route path="/AdminCalendar" element={<AdminCalendar />} />
         <Route path="/AdminHome" element={<AdminHome />} />
+        <Route path="/LoginPage" element={<LoginPage />} />
       </Routes>
     </Router>
   );
