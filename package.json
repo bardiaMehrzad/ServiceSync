@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Team-Best-Effort/ServiceSync#readme",
   "dependencies": {
+    "date-fns": "^4.1.0",
     "react": "^18.2.0",
     "react-calendar": "^5.0.0",
     "react-dom": "^18.2.0",

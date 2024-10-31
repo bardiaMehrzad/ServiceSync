@@ -34,6 +34,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<DefaultHome />} />
+        <Route path="/LoginPage" element={<LoginPage />} />
         <Route path="/AdminCalendar" element={<AdminCalendar />} />
         <Route path="/AdminHome" element={<AdminHome />} />
         <Route path="/AdminPayroll" element={<AdminPayroll />} />
