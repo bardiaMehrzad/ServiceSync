@@ -11,6 +11,7 @@ import AdminHome from "./pages/AdminHome";
 import AdminPayroll from "./pages/AdminPayroll";
 import LoginPage from "./pages/LoginPage";
 import CompanyCreation from "./pages/CompanyCreation";
+import AdminJobPage from "./pages/AdminJobPage";
 import './App.css';
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
         <Link to="/AdminPayroll">
           <button className="nav-button">Admin Payroll</button>
         </Link>
+        <Link to="/AdminJobPage">
+          <button className="nav-button">Admin Job Page</button>
+        </Link>
         <Link to="/LoginPage">
           <button className="nav-button">login page</button>
         </Link>
@@ -42,6 +46,7 @@ function App() {
         <Route path="/AdminCalendar" element={<AdminCalendar />} />
         <Route path="/AdminHome" element={<AdminHome />} />
         <Route path="/AdminPayroll" element={<AdminPayroll />} />
+        <Route path="/AdminJobPage" element={<AdminJobPage />} />
         <Route path="/LoginPage" element={<LoginPage />} />
         <Route path="/CompanyCreation" element={<CompanyCreation />} />
       </Routes>
