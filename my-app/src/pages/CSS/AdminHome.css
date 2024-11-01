@@ -7,11 +7,10 @@
 }
 
 html, body {
-    background: linear-gradient(180deg, #3C3C43 0%, #6F6F78 95%);
-    height: 100%;
     font-family: 'Lexend', sans-serif;
 }
 .admin-home {
+    background: linear-gradient(180deg, #3C3C43 0%, #6F6F78 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

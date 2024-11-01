@@ -12,7 +12,6 @@ import AdminPayroll from "./pages/AdminPayroll";
 import LoginPage from "./pages/LoginPage";
 import CompanyCreation from "./pages/CompanyCreation";
 import AdminJobPage from "./pages/AdminJobPage";
-import './App.css';
 function App() {
   return (
     <Router>
