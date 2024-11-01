@@ -10,6 +10,7 @@ import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
 import AdminPayroll from "./pages/AdminPayroll";
 import LoginPage from "./pages/LoginPage";
+import CompanyCreation from "./pages/CompanyCreation";
 import './App.css';
 function App() {
   return (
@@ -30,6 +31,9 @@ function App() {
         <Link to="/LoginPage">
           <button className="nav-button">login page</button>
         </Link>
+        <Link to="/CompanyCreation">
+          <button className="nav-button">Company Creation page</button>
+        </Link>
       </div>
 
       <Routes>
@@ -39,6 +43,7 @@ function App() {
         <Route path="/AdminHome" element={<AdminHome />} />
         <Route path="/AdminPayroll" element={<AdminPayroll />} />
         <Route path="/LoginPage" element={<LoginPage />} />
+        <Route path="/CompanyCreation" element={<CompanyCreation />} />
       </Routes>
     </Router>
   );
