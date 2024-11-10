@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import Calendar from "react-calendar"; 
-import 'react-calendar/dist/Calendar.css'; 
-import './CSS/AdminCalendar.css'; 
+import Calendar from "react-calendar";
+import 'react-calendar/dist/Calendar.css';
+import './CSS/AdminCalendar.css';
+import { Link } from 'react-router-dom';
 
 const AdminCalendar = () => {
-    const [date, setDate] = useState(new Date()); 
+    const [date, setDate] = useState(new Date());
     const handleSelectDate = () => {
-        const newDate = new Date(10/20/2024); 
-        setDate(newDate); 
+        const newDate = new Date(10 / 20 / 2024);
+        setDate(newDate);
     };
 
     return (
@@ -18,11 +19,11 @@ const AdminCalendar = () => {
                     <div className="company-logo">Company Logo Here</div>
                 </div>
                 <div className="navbar-right">
-                    <button>Home</button>
-                    <button>Calendar</button>
-                    <button>Jobs</button>
-                    <button>Payroll</button>
-                    <button>Log Out</button>
+                    <Link to="/AdminHome"><button>Home</button></Link>
+                    <Link to="/AdminCalendar"><button>Calendar</button></Link>
+                    <Link to="/AdminJobPage"><button>Jobs</button></Link>
+                    <Link to="/AdminPayroll"><button>Payroll</button></Link>
+                    <Link to="/LoginPage"><button>Log Out</button></Link>
                     <div className="user-info">User Info Here</div>
                 </div>
             </header>
@@ -32,9 +33,9 @@ const AdminCalendar = () => {
                     <div className="calendar">
                         <Calendar value={date} />
                     </div>
-                    </div>
                 </div>
             </div>
+        </div>
     );
 };
 
