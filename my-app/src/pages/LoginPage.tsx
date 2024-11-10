@@ -1,5 +1,6 @@
 import React from "react"; // Import React for creating components.
 import './CSS/LoginPage.css'; // Import custom CSS for styling.
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
     return (
@@ -36,8 +37,8 @@ const LoginPage = () => {
                         </label>
                         <a href="#forgot-password">Forgot Password?</a>
                     </div>
-                    <button type="submit" className="sign-in-button">Sign In</button>
-                    <button type="button" className="sign-up-button">Sign Up</button>
+                    <Link to="/AdminHome"><button type="submit" className="sign-in-button">Sign In</button></Link>
+                    <Link to="/AdminHome"><button type="button" className="sign-up-button">Sign Up</button></Link>
                 </form>
             </div>
         </div>

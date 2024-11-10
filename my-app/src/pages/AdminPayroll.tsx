@@ -1,5 +1,6 @@
 import React from "react";
-import './CSS/AdminCalendar.css';  // You can reuse the same CSS file
+import './CSS/AdminCalendar.css';
+import { Link } from 'react-router-dom'; // You can reuse the same CSS file
 
 const AdminPayroll = () => {
     return (
@@ -10,11 +11,11 @@ const AdminPayroll = () => {
                     <div className="company-logo">Company Logo Here</div>
                 </div>
                 <div className="navbar-right">
-                    <button>Home</button>
-                    <button>Calendar</button>
-                    <button>Jobs</button>
-                    <button>Payroll</button>
-                    <button>Log Out</button>
+                    <Link to="/AdminHome"><button>Home</button></Link>
+                    <Link to="/AdminCalendar"><button>Calendar</button></Link>
+                    <Link to="/AdminJobPage"><button>Jobs</button></Link>
+                    <Link to="/AdminPayroll"><button>Payroll</button></Link>
+                    <Link to="/LoginPage"><button>Log Out</button></Link>
                     <div className="user-info">User Info Here</div>
                 </div>
             </header>

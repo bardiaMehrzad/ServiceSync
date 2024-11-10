@@ -1,5 +1,6 @@
 import React from "react";
 import './CSS/AdminHome.css';
+import { Link } from 'react-router-dom';
 
 const AdminHome = () => {
     return (
@@ -10,11 +11,11 @@ const AdminHome = () => {
                     <div className="company-logo">Company Logo Here</div>
                 </div>
                 <div className="navbar-right">
-                    <button>Home</button>
-                    <button>Calendar</button>
-                    <button>Jobs</button>
-                    <button>Payroll</button>
-                    <button>Log Out</button>
+                    <Link to="/AdminHome"><button>Home</button></Link>
+                    <Link to="/AdminCalendar"><button>Calendar</button></Link>
+                    <Link to="/AdminJobPage"><button>Jobs</button></Link>
+                    <Link to="/AdminPayroll"><button>Payroll</button></Link>
+                    <Link to="/LoginPage"><button>Log Out</button></Link>
                     <div className="user-info">User Info Here</div>
                 </div>
             </header>
@@ -54,7 +55,7 @@ const AdminHome = () => {
                     </div>
                 </div>
                 <div className="payroll-button">
-                    <button>Payroll</button>
+                    <Link to="/AdminPayroll"><button>Payroll</button></Link>
                 </div>
             </div>
         </div>
