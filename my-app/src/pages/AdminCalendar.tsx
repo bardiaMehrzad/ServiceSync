@@ -3,16 +3,20 @@ import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import './CSS/AdminCalendar.css';
 import { Link } from 'react-router-dom';
+import GoogleCalendar from "./APIs/GoogleCalendar"; // Ensure this path is correct and the file exists
 
 const AdminCalendar = () => {
     const [date, setDate] = useState(new Date());
+    
+    // Function to handle date selection (example use case)
     const handleSelectDate = () => {
-        const newDate = new Date(10 / 20 / 2024);
+        const newDate = new Date(2024, 9, 20); // Note: Month is 0-indexed in JS
         setDate(newDate);
     };
 
     return (
         <div className="admin-calendar">
+            {/* Navbar Section */}
             <header className="navbar">
                 <div className="navbar-left">
                     <div className="servicesync-text">ServiceSync</div>
@@ -27,12 +31,12 @@ const AdminCalendar = () => {
                     <div className="user-info">User Info Here</div>
                 </div>
             </header>
+
+            {/* Page Content */}
             <div className="page-content">
-                <div className="calendar-section">
-                    <h2>Job Calendar</h2>
-                    <div className="calendar">
-                        <Calendar value={date} />
-                    </div>
+                {/* Google Calendar Section */}
+                <div className="google-calendar-section">
+                    <GoogleCalendar />
                 </div>
             </div>
         </div>

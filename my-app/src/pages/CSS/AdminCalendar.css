@@ -79,3 +79,18 @@ html, body {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+.google-calendar-section {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+.google-calendar-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+.google-calendar-section li {
+    margin: 5px 0;
+}
