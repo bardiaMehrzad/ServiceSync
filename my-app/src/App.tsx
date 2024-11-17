@@ -12,6 +12,7 @@ import AdminPayroll from "./pages/AdminPayroll";
 import LoginPage from "./pages/LoginPage";
 import CompanyCreation from "./pages/CompanyCreation";
 import AdminJobPage from "./pages/AdminJobPage";
+import EmployeeCalendar from "./pages/EmployeeCalendar";
 function App() {
   return (
     <Router>
@@ -24,6 +25,7 @@ function App() {
         <Route path="/AdminJobPage" element={<AdminJobPage />} />
         <Route path="/LoginPage" element={<LoginPage />} />
         <Route path="/CompanyCreation" element={<CompanyCreation />} />
+        <Route path="/EmployeeCalendar" element={<EmployeeCalendar />}/>
       </Routes>
     </Router>
   );
