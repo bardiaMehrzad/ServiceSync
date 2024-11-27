@@ -20,7 +20,7 @@ ServiceSync bridges these gaps by offering an all-in-one platform with robust fe
 ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances overall efficiency. With its mobile and web-based functionality, plumbing teams can focus more on delivering exceptional client service while administrators enjoy a hassle-free, streamlined workflow.  
 
 ## <img src="https://i.imgur.com/oOqbd1A.png" width="40" height="40"> Team Best Effort Members  
-
+<div align="center">
 | Name                | Email                     |
 |---------------------|---------------------------|
 | Khalid Abouelrous   | kabouelrous@csus.edu      |
