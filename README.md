@@ -40,7 +40,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
   <img src="https://i.imgur.com/b7qkiit.png" width="500">
 </div>
 
-### Frontend
+### <img src="https://i.imgur.com/8k3qpxt.png" width="30" height="30"> Frontend
 - **Programming Language**:  
   - **TypeScript**: Used in combination with React, resulting in `.tsx` files for type-safe component creation.  
 
@@ -54,13 +54,13 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 
 ---
 
-### Backend
+### <img src="https://i.imgur.com/ZNHLJEh.png" width="30" height="30"> Backend
 - **Amazon RDS (Relational Database Service)**:  
   Ideal for handling structured data, suitable for applications requiring relational data structures (e.g., MySQL or PostgreSQL).  
 
 ---
 
-### API
+### <https://i.imgur.com/MwX33K3.png" width="30" height="30"> API
 1. **QuickBooks API**: For payroll and financial management.  
 2. **Google Maps API**: For GPS check-in and employee tracking.  
 3. **Stripe API**: Handles secure online payments from clients, automates invoicing, and processes transactions within the app.  
@@ -68,6 +68,6 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 
 ---
 
-### Servers
+### <https://i.imgur.com/5QpZqVi.png" width="30" height="30"> Servers
 - **AWS Amplify**: Supports real-time data synchronization, essential for the application's requirements, such as employee tracking and scheduling updates.  
 
