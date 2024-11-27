@@ -1,2 +1,3 @@
-# ServiceSync
-ServiceSync Web Application for CSC 190 &amp; CSC191
+<div align="center">
+  <img src="https://imgur.com/58qUXV3](https://i.imgur.com/58qUXV3.png" alt="Description of Image" width="500">
+</div>
