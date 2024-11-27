@@ -9,17 +9,17 @@
 - **Employee Accessibility**: Employees often struggle to access job details, track hours accurately, and find worksite locations.  
 - **Administrative Burden**: Administrators face challenges in synchronizing schedules, assignments, and payroll, resulting in frustration and missed details.  
 
-## How ServiceSync Helps  
+## <img src="https://i.imgur.com/Td36qPn.png" width="40" height="40"> How ServiceSync Helps  
 ServiceSync bridges these gaps by offering an all-in-one platform with robust features:  
 - **Integrated Scheduling and Time Tracking**: Ensure seamless job assignments and accurate timekeeping.  
 - **Mobile Employee View**: Empower employees with real-time access to job details, worksite locations, and schedules while on the go.  
 - **Admin Dashboard**: Simplifies task management with intuitive tools for organizing jobs, tracking progress, and managing payroll.  
 - **Built-In Tools**: Includes maps for navigation, calendar integration, and QuickBooks API support to centralize all job-related operations.  
 
-## Benefits  
+## <img src="https://i.imgur.com/M0yE4wR.png" width="40" height="40"> Benefits  
 ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances overall efficiency. With its mobile and web-based functionality, plumbing teams can focus more on delivering exceptional client service while administrators enjoy a hassle-free, streamlined workflow.  
 
-## Team Best Effort Members  
+## <img src="https://i.imgur.com/oOqbd1A.png" width="40" height="40"> Team Best Effort Members  
 
 | Name                | Email                     |
 |---------------------|---------------------------|
@@ -32,7 +32,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 | Joshua Ortiz Pineda | jortizpineda@csus.edu     |
 | Mohammad Imrose     | taufiqsaimun@csus.edu     |
 
-## Tech Stack
+## <img src="https://i.imgur.com/osRgn8I.png" width="40" height="40"> Tech Stack
 
 ### Frontend
 - **Programming Language**:  
