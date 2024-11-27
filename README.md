@@ -72,6 +72,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 - **AWS Amplify**: Supports real-time data synchronization, essential for the application's requirements, such as employee tracking and scheduling updates.
 - 
 ## <img src="https://i.imgur.com/k7hvCvD.png" width="40" height="40"> Developer Instructions 
+This guide will walk you through the steps required to set up the development environment for the ServiceSync project. Follow the instructions below to clone the repository, navigate to the appropriate directories, and run the servers.
 1. **Clone the repository**  
    Run the following command to clone the repository:
    ```bash
