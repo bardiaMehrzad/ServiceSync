@@ -4,7 +4,7 @@
  
 **ServiceSync** is an innovative solution designed to streamline operations for small and medium-sized plumbing businesses. Recognizing the challenges of managing plumbing jobs—from scheduling and employee assignments to time tracking and payroll—ServiceSync simplifies and unifies these processes into a single, user-friendly platform.  
 
-## Key Challenges Addressed  
+## ![Icon](https://i.imgur.com/lpOEMLo.png) Key Challenges Addressed  
 - **Fragmented Workflows**: Managing job information across multiple tools leads to inefficiencies, errors, and wasted time.  
 - **Employee Accessibility**: Employees often struggle to access job details, track hours accurately, and find worksite locations.  
 - **Administrative Burden**: Administrators face challenges in synchronizing schedules, assignments, and payroll, resulting in frustration and missed details.  
