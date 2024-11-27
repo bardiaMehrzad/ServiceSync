@@ -39,6 +39,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 <div align="center">
   <img src="https://i.imgur.com/b7qkiit.png" width="500">
 </div>
+
 ### Frontend
 - **Programming Language**:  
   - **TypeScript**: Used in combination with React, resulting in `.tsx` files for type-safe component creation.  
