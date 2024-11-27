@@ -60,7 +60,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 
 ---
 
-### <https://i.imgur.com/MwX33K3.png" width="30" height="30"> API
+### <img src="https://i.imgur.com/MwX33K3.png" width="30" height="30"> API
 1. **QuickBooks API**: For payroll and financial management.  
 2. **Google Maps API**: For GPS check-in and employee tracking.  
 3. **Stripe API**: Handles secure online payments from clients, automates invoicing, and processes transactions within the app.  
@@ -68,6 +68,6 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 
 ---
 
-### <https://i.imgur.com/5QpZqVi.png" width="30" height="30"> Servers
+### <img src="https://i.imgur.com/5QpZqVi.png" width="30" height="30"> Servers
 - **AWS Amplify**: Supports real-time data synchronization, essential for the application's requirements, such as employee tracking and scheduling updates.  
 
