@@ -31,6 +31,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 | Bilal Baloch        | bbaloch2@csus.edu         |
 | Joshua Ortiz Pineda | jortizpineda@csus.edu     |
 | Mohammad Imrose     | taufiqsaimun@csus.edu     |
+</div>
 
 ## <img src="https://i.imgur.com/osRgn8I.png" width="40" height="40"> Tech Stack
 
