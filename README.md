@@ -69,5 +69,20 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 ---
 
 ### <img src="https://i.imgur.com/5QpZqVi.png" width="30" height="30"> Servers
-- **AWS Amplify**: Supports real-time data synchronization, essential for the application's requirements, such as employee tracking and scheduling updates.  
+- **AWS Amplify**: Supports real-time data synchronization, essential for the application's requirements, such as employee tracking and scheduling updates.
+- 
+## <img src="https://i.imgur.com/k7hvCvD.png" width="40" height="40"> Developer Instructions 
+1. **Clone the repository**  
+   Run the following command to clone the repository:
+   ```bash
+   git clone https://github.com/Team-Best-Effort/ServiceSync.git
+2. **Go to the project directory**  
+   After cloning the repository, navigate to the root of the project directory:
+   ```bash
+    cd .\my-app\
+3. **Install dependencies and run the servers**  
+   Install the necessary dependencies and run the servers. Run the following commands in both terminals:
+   ```bash
+   npm install
+   npm start
 
