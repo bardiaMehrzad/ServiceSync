@@ -19,21 +19,47 @@ ServiceSync bridges these gaps by offering an all-in-one platform with robust fe
 ## <img src="https://i.imgur.com/M0yE4wR.png" width="40" height="40"> Benefits  
 ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances overall efficiency. With its mobile and web-based functionality, plumbing teams can focus more on delivering exceptional client service while administrators enjoy a hassle-free, streamlined workflow.  
 
-## <img src="https://i.imgur.com/oOqbd1A.png" width="40" height="40"> Team Best Effort Members  
-<p align="center">
+## <img src="https://i.imgur.com/oOqbd1A.png" width="40" height="40"> Team Best Effort Members 
+<table align="center">
+<tr>
+  <th>Team Member</th>
+  <th>Email</th>
+</tr>
+<tr>
+  <td>Mohammad Taufique Imrose</td>
+  <td>taufiqsaimun@csus.edu</td>
+</tr>
+<tr>
+  <td>Joshua Ortiz Pineda</td>
+  <td>jortizpineda@csus.edu</td>
+</tr>
+<tr>
+  <td>Bilal Baloch</td>
+  <td>bbaloch2@csus.edu</td>
+</tr>
+<tr>
+  <td>Bardia Mehrzad</td>
+  <td>bardiamehrzad@csus.edu</td>
+</tr>
+<tr>
+  <td>Max Rutherford</td>
+  <td>mrutherford@csus.edu</td>
+</tr>
+<tr>
+  <td>Mohamed Burhan</td>
+  <td>mburhan@csus.edu</td>
+</tr>
+<tr>
+  <td>Hashem Battah</td>
+  <td>hbattah@csus.edu</td>
+</tr>
+<tr>
+  <td>Khalid Abouelrous</td>
+  <td>kabouelrous@csus.edu</td>
+</tr>
+</table>
 
-| Name                | Email                     |
-|---------------------|---------------------------|
-| Khalid Abouelrous   | kabouelrous@csus.edu      |
-| Hashem Battah       | hbattah@csus.edu          |
-| Mohamed Burhan      | mburhan@csus.edu          |
-| Max Rutherford      | mrutherford@csus.edu      |
-| Bardia Mehrzad      | bardiamehrzad@csus.edu    |
-| Bilal Baloch        | bbaloch2@csus.edu         |
-| Joshua Ortiz Pineda | jortizpineda@csus.edu     |
-| Mohammad Imrose     | taufiqsaimun@csus.edu     |
 
-</p>
 
 ## <img src="https://i.imgur.com/osRgn8I.png" width="40" height="40"> Tech Stack
 <div align="center">
