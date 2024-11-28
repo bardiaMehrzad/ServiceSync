@@ -108,7 +108,7 @@ This guide will walk you through the steps required to set up the development en
    ```bash
     cd .\my-app\
 3. **Install dependencies and run the servers**  
-   Install the necessary dependencies and run the servers. Run the following commands in both terminals:
+   Install the necessary dependencies and run the servers. Run the following commands in the terminal:
    ```bash
    npm install
    npm start
