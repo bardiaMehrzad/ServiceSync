@@ -115,6 +115,16 @@ This guide will walk you through the steps required to set up the development en
 
 ---
 
+## Deployment Instructions
+- TBA, will be done in CSC 191
+
+---
+
+## Testing Instructions
+- TBA, will be done in CSC 191
+
+---
+
 ## <img src="https://e7.pngegg.com/pngimages/993/133/png-clipart-calendar-computer-icons-calendar-date-mount-olivet-lutheran-church-of-plymouth-time-calender-miscellaneous-calendar-thumbnail.png" width="40" height="40"> Development Timeline
 <table align="center">
 <tr>
