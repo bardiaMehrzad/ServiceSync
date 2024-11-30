@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/58qUXV3.png" width="500">
 </div>
  
-**ServiceSync** is an innovative solution designed to streamline operations for small and medium-sized plumbing businesses. Recognizing the challenges of managing plumbing jobs—from scheduling and employee assignments to time tracking and payroll—ServiceSync simplifies and unifies these processes into a single, user-friendly platform.  
+**ServiceSync** is an innovative solution designed to streamline operations for small and medium-sized trade businesses. Recognizing the challenges of managing trade jobs—from scheduling and employee assignments to time tracking and payroll—ServiceSync simplifies and unifies these processes into a single, user-friendly platform.  
 
 ## <img src="https://i.imgur.com/lpOEMLo.png" width="40" height="40"> Key Challenges Addressed  
 - **Fragmented Workflows**: Managing job information across multiple tools leads to inefficiencies, errors, and wasted time.  
@@ -89,7 +89,7 @@ ServiceSync eliminates redundant data entry, reduces manual tasks, and enhances 
 ### <img src="https://i.imgur.com/MwX33K3.png" width="30" height="30"> API
 1. **QuickBooks API**: For payroll and financial management.  
 2. **Google Maps API**: For GPS check-in and employee tracking.  
-3. **Stripe API**: Handles secure online payments from clients, automates invoicing, and processes transactions within the app.  
+<!-- 3. **Stripe API**: Handles secure online payments from clients, automates invoicing, and processes transactions within the app.  -->
 4. **Twilio API**: Supports scalability as the business grows, allowing easy expansion of communication features.  
 
 ---
@@ -112,4 +112,55 @@ This guide will walk you through the steps required to set up the development en
    ```bash
    npm install
    npm start
+
+---
+
+## <img src="https://e7.pngegg.com/pngimages/993/133/png-clipart-calendar-computer-icons-calendar-date-mount-olivet-lutheran-church-of-plymouth-time-calender-miscellaneous-calendar-thumbnail.png" width="40" height="40"> Development Timeline
+<table align="center">
+<tr>
+  <th>Task to Completle</th>
+  <th>Sprint Info</th>
+  <th>Status</th>
+</tr>
+<tr>
+  <td>Project Mockups & Research</td>
+  <td>Sprints 0 & 1: August 26 to October 6, 2024</td>
+  <td>Completed</td>
+</tr>
+<tr>
+  <td>Creating a Non-Functional UI for the Application</td>
+  <td>Sprints 2 & 3: October 7 to November 10, 2024</td>
+  <td>Completed</td>
+</tr>
+<tr>
+  <td>Linking the Pages Togther and Implementing the API's</td>
+  <td>Sprint 4: November 11 to November 24, 2024</td>
+  <td>Completed</td>
+</tr>
+<tr>
+  <td>Account Creation/Login</td>
+  <td>Sprint 5: January 26 to February 8, 2025</td>
+  <td>Planned</td>
+</tr>
+<tr>
+  <td>Linking the API's Together</td>
+  <td>Sprint 6: February 9 to February 22, 2025</td>
+  <td>Planned</td>
+</tr>
+<tr>
+  <td>Implementing Code Testing</td>
+  <td>Sprint 7: February 23 to March 8, 2025</td>
+  <td>Planned</td>
+</tr>
+<tr>
+  <td>Overhauling the UI</td>
+  <td>Sprint 8: March 9 to March 22, 2025</td>
+  <td>Planned</td>
+</tr>
+<tr>
+  <td>Tech Debt & Code Cleanup</td>
+  <td>Sprint 9: March 23 to April 5, 2025</td>
+  <td>Planned</td>
+</tr>
+</table>
 
