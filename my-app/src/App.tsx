@@ -3,9 +3,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link
-} from 'react-router-dom';
-import DefaultHome from "./pages/DefaultHome";
+  Navigate,
+} from "react-router-dom";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
 import AdminPayroll from "./pages/AdminPayroll";
@@ -16,14 +15,14 @@ import CompanyCreation from "./pages/CompanyCreation";
 import AdminJobPage from "./pages/AdminJobPage";
 import EmployeeCalendar from "./pages/EmployeeCalendar";
 
-// Import the functions you need from the SDKs you need
+// Import Firebase
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Import AuthContext
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC-zHokpPV316sdixgDhPizAgz4h_m1U84",
   authDomain: "fir-for-auth-web-app.firebaseapp.com",
@@ -31,14 +30,18 @@ const firebaseConfig = {
   storageBucket: "fir-for-auth-web-app.firebasestorage.app",
   messagingSenderId: "79542475148",
   appId: "1:79542475148:web:2e835ba094dbf469979ea9",
-  measurementId: "G-CVX4XY78EL"
+  measurementId: "G-CVX4XY78EL",
 };
 
-// Initialize Firebase
+// Initialize Firebase and Authentication
 const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+// ProtectedRoute component for securing routes
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  return user ? <>{children}</> : <Navigate to="/LoginPage" />;
+};
 
 function App() {
   return (
