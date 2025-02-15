@@ -1,7 +1,32 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
+// For authentication 
+import { FirestoreAdapter } from "@auth/firebase-adapter"
+import { cert } from "firebase-admin/app"
 
+// For database
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+// TODO: Replace the following with your app's Firebase project configuration
+// See: https://support.google.com/firebase/answer/7015592
+const firebaseConfig = {
+  apiKey: "AIzaSyBFniAJrUFXWQt9l998QPdZsEHYPUAvU1U",
+  authDomain: "service-sync-workforce.firebaseapp.com",
+  projectId: "service-sync-workforce",
+  storageBucket: "service-sync-workforce.firebasestorage.app",
+  messagingSenderId: "977504110671",
+  appId: "1:977504110671:web:987b7e1ac1881edc26c23a",
+  measurementId: "G-GNF6119CFF"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
 
 const providers: Provider[] = [Credentials({
   credentials: {
@@ -33,6 +58,13 @@ export const providerMap = providers.map((provider) => {
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: FirestoreAdapter({
+    credential: cert({
+      projectId: process.env.AUTH_FIREBASE_PROJECT_ID,
+      clientEmail: process.env.AUTH_FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.AUTH_FIREBASE_PRIVATE_KEY,
+    }),
+  }),
   providers,
   
   
