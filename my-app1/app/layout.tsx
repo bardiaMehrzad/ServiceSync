@@ -39,11 +39,7 @@ const NAVIGATION: Navigation = [
     title: 'Jobs',
     icon: <Work />,
   },
-  {
-    segment: 'eCalendar',
-    title: 'Employee Calendar',
-    icon: <Schedule />,
-  },
+  
   {
     kind: 'divider',
   },

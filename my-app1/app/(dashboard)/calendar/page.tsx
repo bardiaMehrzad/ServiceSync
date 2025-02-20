@@ -7,7 +7,6 @@ export default function OrdersPage() {
 
   return (
     <><Typography>
-      Admin Calendar Section
     </Typography><Calendar /></>
   );
 }

@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import JobsTable from './jobs/JobsTable';
 import { Calendar } from './calendar/Calender';
 import Loader from './Loader'; // Ensure this path is correct
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -29,14 +31,25 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      <Typography>
-        Welcome, <strong>{user.name}</strong>! {/* Display the logged username */}
+    <Box sx={{ flexGrow: 1, p: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Welcome, <strong>{user.name}</strong>!
       </Typography>
-      <div style={{ marginBottom: '20px' }}>
-        <Calendar />
-      </div>
-      <JobsTable />
-    </div>
+      <Grid container spacing={3} columns={2}>
+        {/* Left Box - Calendar */}
+        <Grid item xs={12} md={6}>
+          <Box p={2} sx={{ border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
+            <Calendar />
+          </Box>
+        </Grid>
+  
+        {/* Right Box - Jobs Table */}
+        <Grid item xs={12} md={6}>
+          <Box p={2} sx={{ border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
+            <JobsTable />
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
