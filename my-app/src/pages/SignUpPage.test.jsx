@@ -15,7 +15,7 @@ describe("SignUpPage", () => {
 
   it("renders the sign up page correctly", () => {
     // Check for header and informational text.
-    expect(screen.getByText(/Sign Up\!/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Sign Up/i })).toBeInTheDocument();
     
     expect(
       screen.getByText(/Please enter your details to create an account/i)
