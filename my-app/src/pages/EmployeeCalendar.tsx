@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import 'react-calendar/dist/Calendar.css';
-import GoogleCalendar from "./APIs/GoogleCalendar"; // Ensure this path is correct and the file exists
+import GoogleCalendar from ".//APIs/GoogleCalendar"; // Ensure this path is correct and the file exists
 
 const EmployeeCalendar = () => {
     return (
