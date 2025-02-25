@@ -15,13 +15,14 @@ describe("SignUpPage", () => {
 
   it("renders the sign up page correctly", () => {
     // Check for header and informational text.
-    expect(screen.getByText(/Sign Up/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sign Up\!/i)).toBeInTheDocument();
+    
     expect(
       screen.getByText(/Please enter your details to create an account/i)
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Already have an account\? Sign In/i)
-    ).toBeInTheDocument();
+    
+    expect(screen.getByText(/Already have an account\?/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Sign In/i })).toBeInTheDocument();
 
     // Check that the email input, password input, and company code input are rendered with placeholders.
     expect(screen.getByPlaceholderText(/Your Email/i)).toBeInTheDocument();
