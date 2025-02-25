@@ -19,20 +19,15 @@ export default function JobsPage() {
   return (
     <>
       {/* Page Header */}
-      <Typography variant="h4" gutterBottom>
-        Jobs Management
-      </Typography>
+   
 
-      {/* Button to open Create Job Dialog */}
-      <Button variant="contained" color="primary" onClick={handleOpen} style={{ marginBottom: "16px" }}>
-        Create New Job
-      </Button>
-
-      {/* Create Job Dialog */}
-      <CreateJobDialog open={open} onClose={handleClose} />
 
       {/* Jobs Table */}
       <JobsTable />
+
+      
+      {/* Create Job Dialog */}
+      <CreateJobDialog open={open} onClose={handleClose} />
     </>
   );
 }

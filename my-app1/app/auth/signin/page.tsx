@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { providerMap } from '../../../auth';
@@ -9,6 +10,34 @@ import { Box, Alert, Typography } from '@mui/material';
 const BRANDING = {
   title: 'ServiceSync',
 };
+
+function DemoInfo() {
+  return (
+    <Alert
+    severity="info"
+    sx={{
+      boxShadow: '0 1px 12px #00c4cc',
+      marginTop: '1rem',
+      borderRadius: '6px',
+      color: '#00c4cc',
+      '& .MuiAlert-icon': {
+        color: '#00c4cc',
+      },
+      width: '100%',
+      maxWidth: '500px',
+     
+      justifyContent: 'center',
+      alignItems: 'center',
+      '& .MuiAlert-message': {
+        textAlign: 'center',
+        width: '100%',
+      },
+    }}
+  >
+    Please log in with your credinetials
+  </Alert>
+  );
+}
 
 export default function SignIn() {
   return (
@@ -43,8 +72,10 @@ export default function SignIn() {
               top: '40%',
               left: '10%',
               color: '#ffffff',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+              textShadow: '1px 1px 4px rgb(36, 35, 35)',
               textAlign: 'left',
+              textDecorationStyle: 'double',
+          
             }}
           >
             <Typography
@@ -78,45 +109,32 @@ export default function SignIn() {
             alignItems: 'center',
             height: '100%', // Ensure it stays within parent height
             padding: '4rem',
+          
           }}
         >
-          <Alert
-            severity="info"
-            sx={{
-              marginBottom: '-4rem',
-              borderRadius: '16px',
-              color: '#00c4cc',
-              '& .MuiAlert-icon': {
-                color: '#00c4cc',
-              },
-              width: '100%',
-              maxWidth: '500px',
-             
-              justifyContent: 'center',
-              alignItems: 'center',
-              '& .MuiAlert-message': {
-                textAlign: 'center',
-                width: '100%',
-              },
-            }}
-          >
-            Please log in with your email, password.
-          </Alert>
 
           <SignInPage
             signIn={signIn}
             providers={providerMap}
             slotProps={{ emailField: { autoFocus: false } }}
+            slots={{ subtitle: DemoInfo, title: () => (
+              <span style={{ fontWeight: 'bold', fontSize: '20px' }}>
+                <span style={{ color: '#CBCECD' }}>Sign in to Service</span>
+                <span style={{ color: '#00c4cc' }}>Sync</span>
+              </span>
+            ) }}
             sx={{
+             
               '& form': {
                 padding: '2rem',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 maxWidth: '800px',
                 width: '100%',
+           
               },
               '& form > .MuiStack-root': {
                 rowGap: '1rem',
                 alignItems: 'center',
+              
               },
               '& .MuiButton-root': {
                 padding: '0.75rem 1.5rem',
@@ -124,9 +142,10 @@ export default function SignIn() {
                 fontWeight: 'bold',
                 textTransform: 'none',
                 backgroundColor: '#00c4cc',
+                boxShadow: '0 1px 12px #00c4cc',
                 color: '#ffffff',
                 '&:hover': {
-                  backgroundColor: '#115293',
+                  backgroundColor: 'rgba(0, 197, 204, 0.37)',
                 },
               },
               '& .MuiTextField-root': {

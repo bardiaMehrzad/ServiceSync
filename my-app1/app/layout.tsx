@@ -10,7 +10,8 @@ import type { Navigation, Session } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '../auth';
 import theme from '../theme';
-import { CalendarMonthRounded, Event, Logout, MonetizationOn, Schedule, Work } from '@mui/icons-material';
+import Copyright from './Copyright';
+import { AdminPanelSettingsRounded, CalendarMonthRounded, CloudSyncRounded, EditCalendarRounded, Event, HelpCenterRounded, HomeMaxRounded, Logout, ManageAccountsOutlined, ManageAccountsRounded, MonetizationOn, PeopleAltRounded, PeopleOutlined, PrecisionManufacturingOutlined, PriceCheckRounded, ReceiptLongRounded, Schedule, Work, WorkHistoryOutlined } from '@mui/icons-material';
 
 const NAVIGATION: Navigation = [
   {
@@ -20,12 +21,12 @@ const NAVIGATION: Navigation = [
   {
     segment: '',
     title: 'Home',
-    icon: <DashboardIcon />,
+    icon: <HomeMaxRounded />,
   },
   {
     segment: 'calendar',
     title: 'Calendar',
-    icon: <Event />,
+    icon: <EditCalendarRounded />,
   },
   {
     kind: 'divider',
@@ -37,7 +38,12 @@ const NAVIGATION: Navigation = [
   {
     segment: 'jobs',
     title: 'Jobs',
-    icon: <Work />,
+    icon: <WorkHistoryOutlined />,
+  },
+  {
+    segment: 'eManagement',
+    title: 'Modify Employees',
+    icon: <AdminPanelSettingsRounded />,
   },
   
   {
@@ -50,17 +56,35 @@ const NAVIGATION: Navigation = [
   {
     segment: 'payroll',
     title: 'Payroll',
-    icon: <MonetizationOn />,
+    icon: <ReceiptLongRounded />,
   },
  
   {
     kind: 'divider',
   },
+  {
+    kind: 'header',
+    title: 'System',
+  },
  
   {
-    segment: 'logout',
-    title: 'Logout',
-    icon: <Logout />,
+    segment: 'editProfile',
+    title: 'Edit Profile',
+    icon: <ManageAccountsRounded />,
+   
+  },
+ 
+  {
+    segment: 'serviceStatus',
+    title: 'System Status',
+    icon: <CloudSyncRounded />,
+   
+  },
+  
+  {
+    segment: 'userGuide',
+    title: 'User Guide',
+    icon: <HelpCenterRounded />,
    
   },
 ];
@@ -92,6 +116,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               session={session}
             >
               {props.children}
+             
             </NextAppProvider>
           </React.Suspense>
         </AppRouterCacheProvider>

@@ -76,8 +76,11 @@ const providers: Provider[] = [
 
           return {
               id: 'test', // Replace with a unique ID from your database if possible
-              name: 'Test User',
+              name: 'Mohammad Taufique Imrose',
               email: String(credentials.email),
+              role: 'Admin',
+              image: 'https://i.imgur.com/CUBilT8.jpeg',
+              
           };
       },
   }),
