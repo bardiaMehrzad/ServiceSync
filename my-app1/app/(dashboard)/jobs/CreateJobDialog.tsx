@@ -1,104 +1,72 @@
-// CreateJobDialog.tsx
 "use client";
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
+import * as React from "react";
+import { db } from "./lib/firebase";
+import { ref, push, update } from "firebase/database";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
 
 interface CreateJobDialogProps {
   open: boolean;
   onClose: () => void;
 }
-export default function CreateJobDialog({ open, onClose }: CreateJobDialogProps) {
 
-  const [age, setAge] = React.useState('');
-  const [age2, setAge2] = React.useState('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-    setAge2(event.target.value as string);
+export default function CreateJobDialog({ open, onClose }: CreateJobDialogProps) {
+  const [jobType, setJobType] = React.useState("");
+  const [assignedTo, setAssignedTo] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
+
+  const formatPhoneNumber = (input: string) => {
+    const numbers = input.replace(/\D/g, ""); // Remove non-numeric characters
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
+    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!jobType || !assignedTo || !address || !phoneNumber) return;
+
+    const newJobRef = push(ref(db, "jobs"));
+    const newJob = {
+      jobType,
+      assignedTo,
+      address,
+      phoneNumber,
+      status: "Assigned",
+    };
+
+    try {
+      await update(newJobRef, newJob);
+      onClose();
+    } catch (error) {
+      console.error("Error creating job:", error);
+    }
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries((formData as any).entries());
-          const email = formJson.email;
-          console.log(email);
-          onClose();
-        },
-      }}
-    >
-      <DialogTitle>Create a job</DialogTitle>
+    <Dialog open={open} onClose={onClose} PaperProps={{ component: "form", onSubmit: handleSubmit }}>
+      <DialogTitle>Create a Job</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          To add a new job please fill in the following information:
-        </DialogContentText>
-        <TextField
-          autoFocus
-          required
-          margin="normal"
-          id="name"
-          name="jobid"
-          label="Job ID"
-          fullWidth
-          variant="filled"
-        />
-        <InputLabel id="select-label">Job Type</InputLabel>
-        <Select
-          labelId="select-label"
-          fullWidth
-          id="select"
-          value={age}
-          label="Job Type"
-          onChange={handleChange}
-        >
-          <MenuItem value={10}>Plumbing</MenuItem>
-          <MenuItem value={20}>Other</MenuItem>
-          <MenuItem value={30}>Other</MenuItem>
-          <MenuItem value={40}>Other</MenuItem>
+        <InputLabel>Job Type</InputLabel>
+        <Select fullWidth value={jobType} onChange={(e) => setJobType(e.target.value)}>
+          <MenuItem value="Plumbing">Plumbing</MenuItem>
+          <MenuItem value="Electrical">Electrical</MenuItem>
         </Select>
-        <InputLabel id="select-label2">Assign to:</InputLabel>
-        <Select
-          labelId="select-label2"
-          fullWidth
-          id="select2"
-          value={age2}
-          label="Age"
-          onChange={handleChange}
-        >
-          <MenuItem value={50}>Ethan Caldwell</MenuItem>
-          <MenuItem value={60}>Sophia Reyes</MenuItem>
-          <MenuItem value={70}>Lucas Bennett</MenuItem>
-          <MenuItem value={80}>Nathaniel Hayes</MenuItem>
-        </Select>
-        <TextField
-          autoFocus
-          required
-          margin="normal"
-          id="name"
-          name="jobid"
-          label="Address"
-          fullWidth
-          variant="filled"
-        />
+        <TextField required margin="normal" label="Assigned To" fullWidth value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} />
+        <TextField required margin="normal" label="Address" fullWidth value={address} onChange={(e) => setAddress(e.target.value)} />
+        <TextField required margin="normal" label="Phone Number" fullWidth value={phoneNumber} onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Create Job</Button>
       </DialogActions>
     </Dialog>
   );

@@ -1,37 +1,38 @@
-// Jobs.tsx
-"use client";
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import JobsTable from './JobsTable'; // Import the JobsTable component
-import CreateJobDialog from './CreateJobDialog'; // Import the CreateJobDialog component
-import ButtonGroup from '@mui/material/ButtonGroup';
+"use client"; // Ensures this is a Client Component
 
-export default function Jobs() {
+import * as React from "react";
+import Typography from "@mui/material/Typography";
+import JobsTable from "./JobsTable";
+import CreateJobDialog from "./CreateJobDialog";
+import Button from "@mui/material/Button";
+
+export default function JobsPage() {
+  // State to control the Create Job Dialog
   const [open, setOpen] = React.useState(false);
-  const buttons = [
-    <Button key="two">Modify a job</Button>,
-    <Button key="three">Delete a job</Button>,
-  ];
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // Function to open the dialog
+  const handleOpen = () => setOpen(true);
+
+  // Function to close the dialog
+  const handleClose = () => setOpen(false);
 
   return (
-    <><Box sx={{ height: '100%', width: '100%' }}>
-      
-      <JobsTable /> 
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Create a new job
+    <>
+      {/* Page Header */}
+      <Typography variant="h4" gutterBottom>
+        Jobs Management
+      </Typography>
+
+      {/* Button to open Create Job Dialog */}
+      <Button variant="contained" color="primary" onClick={handleOpen} style={{ marginBottom: "16px" }}>
+        Create New Job
       </Button>
-      <CreateJobDialog open={open} onClose={handleClose} /> 
-      <ButtonGroup color="primary" aria-label="Medium-sized button group">
-        {buttons}
-      </ButtonGroup>
-    </Box></>
+
+      {/* Create Job Dialog */}
+      <CreateJobDialog open={open} onClose={handleClose} />
+
+      {/* Jobs Table */}
+      <JobsTable />
+    </>
   );
 }
