@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import 'react-calendar/dist/Calendar.css';
+import { gapi } from "gapi-script";
 import GoogleCalendar from ".//APIs/GoogleCalendar"; // Ensure this path is correct and the file exists
 
 const EmployeeCalendar = () => {

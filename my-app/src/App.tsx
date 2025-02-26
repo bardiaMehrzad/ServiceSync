@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation
 } from "react-router-dom";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminHome from "./pages/AdminHome";
@@ -14,6 +15,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import CompanyCreation from "./pages/CompanyCreation";
 import AdminJobPage from "./pages/AdminJobPage";
 import EmployeeCalendar from "./pages/EmployeeCalendar";
+import Navbar from "./pages/Navbar";
+import LoginPage from "./pages/LoginPage";
 
 // Import Firebase
 import { initializeApp } from "firebase/app";
@@ -43,21 +46,38 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/LoginPage" />;
 };
 
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+
+  // Hide Navbar on these pages
+  const hideNavbarRoutes = ["/SignIn", "/SignUp", "/ForgotPassword"];
+
+  return (
+    <>
+      {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
+      {children}
+    </>
+  );
+};
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<AdminHome />} />
-        <Route path="/SignUp" element={<SignUpPage />} />
-        <Route path="/SignIn" element={<SignInPage />} />
-        <Route path="/ForgotPassword" element={<ForgotPasswordPage />} />
-        <Route path="/AdminCalendar" element={<AdminCalendar />} />
-        <Route path="/AdminHome" element={<AdminHome />} />
-        <Route path="/AdminPayroll" element={<AdminPayroll />} />
-        <Route path="/AdminJobPage" element={<AdminJobPage />} />
-        <Route path="/CompanyCreation" element={<CompanyCreation />} />
-        <Route path="/EmployeeCalendar" element={<EmployeeCalendar />} />
-      </Routes>
+      <Layout>
+
+        <Routes>
+          <Route path="/" element={<AdminHome />} />
+          <Route path="/SignUp" element={<SignUpPage />} />
+          <Route path="/SignIn" element={<SignInPage />} />
+          <Route path="/LoginPage" element={<LoginPage />} />
+          <Route path="/ForgotPassword" element={<ForgotPasswordPage />} />
+          <Route path="/AdminCalendar" element={<AdminCalendar />} />
+          <Route path="/AdminHome" element={<AdminHome />} />
+          <Route path="/AdminPayroll" element={<AdminPayroll />} />
+          <Route path="/AdminJobPage" element={<AdminJobPage />} />
+          <Route path="/CompanyCreation" element={<CompanyCreation />} />
+          <Route path="/EmployeeCalendar" element={<EmployeeCalendar />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 }

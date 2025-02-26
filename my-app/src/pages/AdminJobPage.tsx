@@ -5,20 +5,6 @@ import { Link } from 'react-router-dom';
 const AdminHome = () => {
     return (
         <div className="admin-home">
-            <header className="navbar">
-                <div className="navbar-left">
-                    <div className="servicesync-text">ServiceSync</div>
-                    <div className="company-logo">Company Logo Here</div>
-                </div>
-                <div className="navbar-right">
-                    <Link to="/AdminHome"><button>Home</button></Link>
-                    <Link to="/AdminCalendar"><button>Calendar</button></Link>
-                    <Link to="/AdminJobPage"><button>Jobs</button></Link>
-                    <Link to="/AdminPayroll"><button>Payroll</button></Link>
-                    <Link to="/LoginPage"><button>Log Out</button></Link>
-                    <div className="user-info">User Info Here</div>
-                </div>
-            </header>
 
             <div className="page-content">
 
