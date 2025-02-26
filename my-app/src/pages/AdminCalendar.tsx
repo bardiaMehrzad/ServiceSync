@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import './CSS/AdminCalendar.css';
+import { gapi } from "gapi-script";
 import { Link } from 'react-router-dom';
 import GoogleCalendar from "./APIs/GoogleCalendar"; // Ensure this path is correct and the file exists
 

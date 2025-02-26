@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-
+import { gapi } from "gapi-script";
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID!;
 const API_KEY = process.env.REACT_APP_API_KEY!;
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
