@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
 import { initializeApp } from 'firebase/app';
 import { ref, query, getDatabase, orderByChild, equalTo, get } from 'firebase/database';
+import { use } from 'react';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,6 +14,13 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 };
+
+interface User {
+  name: string;
+  role: string;
+  image: string;
+  email: string;
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -52,7 +60,49 @@ async function findAuthEntry(email: string, password: string): Promise<boolean> 
   }
 }
 
+async function finduserInfo(email: string): Promise<{ 
+  name: string; 
+  email: string; 
+  role: string; 
+  image: string; 
+}> {
+  try {
+      // Create a reference to the Authentication node
+      const authRef = ref(db, 'Authentication');
+      
+      // Query where the 'email' child property equals the provided email
+      const authQuery = query(
+          authRef,
+          orderByChild('email'),    // Use the property name "email", not the email value
+          equalTo(email)            // Match the email value
+      );
 
+      // Execute the query
+      const snapshot = await get(authQuery);
+
+      if (snapshot.exists()) {
+        const userData = Object.values(snapshot.val())[0] as {
+          email: string;
+          name: string;
+          role: string;
+          image: string;
+          password: string;
+        };
+        return {
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          image: userData.image,
+        };
+          }
+      else {
+          return {name:'error',role:'error',image:'error',email:'error'}; // No matching email found
+      }
+  } catch (error) {
+      console.error('Error querying database:', error);
+      throw error;
+  }
+}
 
 const providers: Provider[] = [
   Credentials({
@@ -73,20 +123,18 @@ const providers: Provider[] = [
           if (!result) {
               return null;
           }
-
+          const user: User = await finduserInfo(String(credentials.email));
           return {
-              id: 'test', // Replace with a unique ID from your database if possible
-              name: 'Mohammad Taufique Imrose',
-              email: String(credentials.email),
-              role: 'Admin',
-              image: 'https://i.imgur.com/CUBilT8.jpeg',
+              id: 'What_is_purpose_of_id', // Replace with a unique ID from your database if possible
+              name: user.name,
+              email: user.email,
+              role: user.role,
+              image: user.image,
               
           };
       },
   }),
 ];
-
-
 
 
 export const providerMap = providers.map((provider) => {
@@ -116,6 +164,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       return false; // Redirect unauthenticated users to login page
+    },
+    async session({ session, user }) {
+      // Get the user's email from the session object
+      const userEmail = session.user.email;
+      // Fetch additional data for the user based on their ID or other properties
+      const user1: User = await finduserInfo(userEmail);
+      
+      // Add the additional data to the session object
+      session.user.name = user1.name;
+      session.user.image = user1.image;
+      session.user.email = user1.email;
+      session.user.id = user1.role;
+
+      // You can also modify other parts of the session if needed
+      return session;
     },
   },
 });
