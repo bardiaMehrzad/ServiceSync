@@ -16,17 +16,19 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useTheme } from "@mui/material/styles";
 import { AdminPanelSettingsRounded, EditCalendarRounded, ReceiptLongRounded, WorkHistoryOutlined } from "@mui/icons-material";
 import Avatar from "@mui/material/Avatar";
+import { useSession } from "next-auth/react";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const router = useRouter();
   const theme = useTheme(); // Access the current theme
+  const { data: session } = useSession();
 
   // Hardcoded user data for testing
   const user = {
-    name: "Mohammad Taufique Imrose",
-    role: "Admin", // Example role/status
-    avatar: "https://i.imgur.com/CUBilT8.jpeg", // Placeholder image URL for avatar (replace with actual image or dynamic URL)
+    name: session?.user?.name,
+    role: session?.user?.id, // Example role/status
+    avatar: session?.user?.image, // Placeholder image URL for avatar (replace with actual image or dynamic URL)
   };
 
   // Simulate loading delay
@@ -67,8 +69,8 @@ export default function HomePage() {
           }}
         >
           <Avatar
-            src={user.avatar}
-            alt={user.name}
+            src={user.avatar || "Hey"}
+            alt={user.name || "Hey"}
             sx={{ width: 60, height: 60 }}
           />
           <Box>
