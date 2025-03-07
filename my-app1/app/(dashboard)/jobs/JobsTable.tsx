@@ -11,10 +11,12 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { TextareaAutosize } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
 export default function JobsTable() {
   const [jobs, setJobs] = React.useState<any[]>([]);
+  const [employees, setEmployees] = React.useState<any[]>([]); // New state for employees
   const [selectedJob, setSelectedJob] = React.useState<any>(null);
   const [openModifyDialog, setOpenModifyDialog] = React.useState(false);
   const [openCreateDialog, setOpenCreateDialog] = React.useState(false);
@@ -25,9 +27,12 @@ export default function JobsTable() {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [status, setStatus] = React.useState("Assigned");
 
-  // Fetch jobs from Firebase in real-time
+  // Fetch jobs and employees from Firebase in real-time
   React.useEffect(() => {
     const jobsRef = ref(db, "jobs");
+    const employeesRef = ref(db, "employees");
+
+    // Fetch jobs
     onValue(jobsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -40,9 +45,26 @@ export default function JobsTable() {
         setJobs([]);
       }
     });
+
+    // Fetch employees
+    // Fetch employees
+      onValue(employeesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const employeeList = Object.entries(data).map(([id, employee]: [string, any]) => ({
+            id,
+            name: employee.name,
+            phoneNumber: employee.phone,
+            ...employee,
+          }));
+          setEmployees(employeeList);
+        } else {
+          setEmployees([]);
+        }
+      });
+
   }, []);
 
-  // Format phone number as (XXX) XXX-XXXX
   const formatPhoneNumber = (input: string) => {
     const numbers = input.replace(/\D/g, "");
     if (numbers.length <= 3) return numbers;
@@ -50,7 +72,6 @@ export default function JobsTable() {
     return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
   };
 
-  // Open Create Job Dialog
   const handleCreateJob = () => {
     setOpenCreateDialog(true);
     setJobType("");
@@ -60,7 +81,6 @@ export default function JobsTable() {
     setStatus("Assigned");
   };
 
-  // Submit New Job
   const handleSubmitJob = async () => {
     if (!jobType || !assignedTo || !address || !phoneNumber) return;
 
@@ -75,18 +95,16 @@ export default function JobsTable() {
     }
   };
 
-  // Open Modify Job Dialog
   const handleModify = (job: any) => {
     setSelectedJob(job);
     setJobType(job.jobType);
     setAssignedTo(job.assignedTo);
     setAddress(job.address);
-    setPhoneNumber(job.phoneNumber || "");
+    setPhoneNumber(job.phoneNumber || employees.find(emp => emp.name === job.assignedTo)?.phoneNumber || "");
     setStatus(job.status);
     setOpenModifyDialog(true);
   };
 
-  // Update Job in Firebase
   const handleUpdateJob = async () => {
     if (!selectedJob) return;
 
@@ -105,27 +123,30 @@ export default function JobsTable() {
       console.error("Error updating job:", error);
     }
   };
+  const handleEmployeeSelect = (employeeName: string) => {
+    setAssignedTo(employeeName);
+    const selectedEmployee = employees.find(emp => emp.name === employeeName);
+    setPhoneNumber(selectedEmployee?.phoneNumber || "");
+  };
 
-  // Define button styles based on selection (for dialog)
   const getStatusButtonStyle = (buttonStatus: string) => ({
     backgroundColor:
       status === buttonStatus
         ? "#333"
         : buttonStatus === "Assigned"
-        ? "#BFC1CD" // French Gray
+        ? "#BFC1CD"
         : buttonStatus === "Work in Progress"
-        ? "#ff9800" // Yellow
+        ? "#ff9800"
         : buttonStatus === "Completed"
-        ? "#4caf50" // Green
-        : "#f44336", // Red
+        ? "#4caf50"
+        : "#f44336",
     color: "#fff",
     fontWeight: status === buttonStatus ? "bold" : "normal",
-    borderRadius: "2px", // Reduced border radius for smaller, sharper corners
-    padding: "2px 6px", // Reduced padding for smaller size
-    fontSize: "0.75rem", // Optional: smaller text for compactness
+    borderRadius: "2px",
+    padding: "2px 6px",
+    fontSize: "0.75rem",
   });
 
-  // Define table columns
   const columns: GridColDef[] = [
     { field: "id", headerName: "Job ID", width: 150 },
     { field: "jobType", headerName: "Job Type", width: 200 },
@@ -141,7 +162,7 @@ export default function JobsTable() {
         let backgroundColor, textColor;
         switch (statusValue) {
           case "Assigned":
-            backgroundColor = "#BFC1CD"; 
+            backgroundColor = "#BFC1CD";
             textColor = "#fff";
             break;
           case "Work in Progress":
@@ -149,30 +170,28 @@ export default function JobsTable() {
             textColor = "#fff";
             break;
           case "Completed":
-            backgroundColor = "#4caf50"; 
+            backgroundColor = "#4caf50";
             textColor = "#fff";
             break;
           case "Cancelled":
-            backgroundColor = "#f44336"; 
+            backgroundColor = "#f44336";
             textColor = "#fff";
             break;
           default:
             backgroundColor = "#fff";
             textColor = "#000";
         }
-
         const statusStyle = {
           backgroundColor,
           color: textColor,
-          padding: "2px 15px", // Reduced padding for smaller size
-          borderRadius: "2px", // Reduced border radius for smaller, sharper corners
+          padding: "2px 15px",
+          borderRadius: "2px",
           alignItems: "center",
           justifyContent: "center",
           display: "flex",
-          fontWeight:  "bold" ,
-          fontSize: "0.70rem", // Optional: smaller text for compactness
+          fontWeight: "bold",
+          fontSize: "0.70rem",
         };
-        
         return <span style={statusStyle}>{statusValue}</span>;
       },
     },
@@ -185,12 +204,7 @@ export default function JobsTable() {
           variant="contained"
           color="primary"
           onClick={() => handleModify(params.row)}
-          sx={{
-            borderRadius: "2px", // Reduced border radius for smaller, sharper corners
-            padding: "2px 6px", // Reduced padding for smaller size
-            fontSize: "0.75rem", // Optional: smaller text for compactness
-            minWidth: "60px", // Ensure the button isn’t too narrow
-          }}
+          sx={{ borderRadius: "2px", padding: "2px 6px", fontSize: "0.75rem", minWidth: "60px" }}
         >
           Modify
         </Button>
@@ -204,54 +218,22 @@ export default function JobsTable() {
         Create a new job
       </Button>
 
-     
-
       <DataGrid
         checkboxSelection
         rows={jobs}
         columns={columns}
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-        }
-        initialState={{
-          pagination: { paginationModel: { pageSize: 20 } },
-        }}
+        getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
+        initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
         sx={(theme) => ({
-          backgroundColor: "#1c1c1c", // Dark background like the image
+          backgroundColor: "#1c1c1c",
           borderColor: theme.palette.mode === "dark" ? "#333" : "#e0e0e0",
-          "& .MuiDataGrid-cell": {
-            borderColor: theme.palette.mode === "dark" ? "#333" : "#e0e0e0",
-            color: "#fff", // Light text for dark mode
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#2c2c2c", // Darker header background
-            
-            borderColor: "#333",
-          },
-          "& .MuiDataGrid-footerContainer": {
-        
-            color: "#fff",
-            borderColor: "#333",
-          },
-          "& .MuiCheckbox-root": {
-        
-          },
+          "& .MuiDataGrid-cell": { borderColor: theme.palette.mode === "dark" ? "#333" : "#e0e0e0", color: "#fff" },
+          "& .MuiDataGrid-columnHeaders": { backgroundColor: "#2c2c2c", borderColor: "#333" },
+          "& .MuiDataGrid-footerContainer": { color: "#fff", borderColor: "#333" },
         })}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
         density="compact"
-        slotProps={{
-          filterPanel: {
-            filterFormProps: {
-              logicOperatorInputProps: { variant: "outlined", size: "small" },
-              columnInputProps: { variant: "outlined", size: "small", sx: { mt: "auto" } },
-              operatorInputProps: { variant: "outlined", size: "small", sx: { mt: "auto" } },
-              valueInputProps: {
-                InputComponentProps: { variant: "outlined", size: "small" },
-              },
-            },
-          },
-        }}
       />
 
       {/* Modify Job Dialog */}
@@ -260,20 +242,33 @@ export default function JobsTable() {
         onClose={() => setOpenModifyDialog(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }} // Dark theme for dialog
+        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
       >
         <DialogTitle sx={{ mb: "2px", color: "#fff" }}>Modify Job</DialogTitle>
         <DialogContent sx={{ minHeight: "420px", pt: "10px", backgroundColor: "#2c2c2c", color: "#fff" }}>
+
           <Box sx={{ mt: "30px" }}>
-            <TextField
+           <Select
               fullWidth
-              label="Assigned To"
               value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
+              onChange={(e) => {
+                setAssignedTo(e.target.value);
+                const selectedEmployee = employees.find(emp => emp.name === e.target.value);
+                setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
+              }}
               variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
+              displayEmpty
+              sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
+            >
+              <MenuItem value="" disabled>
+                Select Employee
+              </MenuItem>
+              {employees.map((employee) => (
+                <MenuItem key={employee.id} value={employee.name}>
+                  {employee.name}
+                </MenuItem>
+              ))}
+            </Select>
           </Box>
           <Box sx={{ mt: "30px" }}>
             <TextField
@@ -300,11 +295,7 @@ export default function JobsTable() {
 
           <Typography sx={{ mt: "30px", color: "#fff" }}>Job Status:</Typography>
           <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Assigned")}
-              onClick={() => setStatus("Assigned")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Assigned")} onClick={() => setStatus("Assigned")}>
               Assigned
             </Button>
             <Button
@@ -314,18 +305,10 @@ export default function JobsTable() {
             >
               Work in Progress
             </Button>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Completed")}
-              onClick={() => setStatus("Completed")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Completed")} onClick={() => setStatus("Completed")}>
               Completed
             </Button>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Cancelled")}
-              onClick={() => setStatus("Cancelled")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Cancelled")} onClick={() => setStatus("Cancelled")}>
               Cancelled
             </Button>
           </Box>
@@ -346,7 +329,7 @@ export default function JobsTable() {
         onClose={() => setOpenCreateDialog(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }} // Dark theme for dialog
+        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
       >
         <DialogTitle sx={{ mb: "10px", color: "#fff" }}>Create Job</DialogTitle>
         <DialogContent sx={{ minHeight: "420px", pt: "10px", backgroundColor: "#2c2c2c", color: "#fff" }}>
@@ -362,15 +345,27 @@ export default function JobsTable() {
             />
           </Box>
           <Box sx={{ mt: "15px" }}>
-            <TextField
-              fullWidth
-              label="Assigned To"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
+          <Select
+            fullWidth
+            value={assignedTo}
+            onChange={(e) => {
+              setAssignedTo(e.target.value);
+              const selectedEmployee = employees.find(emp => emp.name === e.target.value);
+              setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
+            }}
+            variant="outlined"
+            displayEmpty
+            sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
+          >
+            <MenuItem value="" disabled>
+              Select Employee
+            </MenuItem>
+            {employees.map((employee) => (
+              <MenuItem key={employee.id} value={employee.name}>
+                {employee.name}
+              </MenuItem>
+            ))}
+          </Select>
           </Box>
           <Box sx={{ mt: "15px" }}>
             <TextField
@@ -397,11 +392,7 @@ export default function JobsTable() {
 
           <Typography sx={{ mt: "15px", color: "#fff" }}>Job Status:</Typography>
           <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Assigned")}
-              onClick={() => setStatus("Assigned")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Assigned")} onClick={() => setStatus("Assigned")}>
               Assigned
             </Button>
             <Button
@@ -411,18 +402,10 @@ export default function JobsTable() {
             >
               Work in Progress
             </Button>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Completed")}
-              onClick={() => setStatus("Completed")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Completed")} onClick={() => setStatus("Completed")}>
               Completed
             </Button>
-            <Button
-              variant="contained"
-              sx={getStatusButtonStyle("Cancelled")}
-              onClick={() => setStatus("Cancelled")}
-            >
+            <Button variant="contained" sx={getStatusButtonStyle("Cancelled")} onClick={() => setStatus("Cancelled")}>
               Cancelled
             </Button>
           </Box>
