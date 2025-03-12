@@ -84,7 +84,7 @@ export default function EmployeeManagement() {
       await set(newEmployeeRef, newEmployee);
       setOpenCreateDialog(false);
     } catch (error) {
-      console.error("Error creating employee:", error);
+      console.warn("Could not add employee. Please try again.");
     }
   };
 
@@ -112,7 +112,7 @@ export default function EmployeeManagement() {
       );
       setOpenEditDialog(false);
     } catch (error) {
-      console.error("Error updating employee:", error);
+      console.warn("Update failed. Ensure the data is valid and try again.");
     }
   };
 
@@ -125,7 +125,7 @@ export default function EmployeeManagement() {
       await remove(employeeRef);
       setEmployees((prevEmployees) => prevEmployees.filter((emp) => emp.id !== id));
     } catch (error) {
-      console.error("Error deleting employee:", error);
+      console.warn("Failed to delete employee. Verify if the entry exists.");
     }
   };
 
@@ -220,7 +220,7 @@ export default function EmployeeManagement() {
         disableColumnResize
         density="compact"
         autoHeight
-       
+
       />
 
       {/* Create Employee Dialog */}

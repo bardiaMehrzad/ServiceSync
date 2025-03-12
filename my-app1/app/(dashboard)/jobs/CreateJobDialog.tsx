@@ -47,7 +47,8 @@ export default function CreateJobDialog({ open, onClose }: CreateJobDialogProps)
       await update(newJobRef, newJob);
       onClose();
     } catch (error) {
-      console.error("Error creating job:", error);
+      console.warn("Could not add job. Please try again.");
+
     }
   };
 

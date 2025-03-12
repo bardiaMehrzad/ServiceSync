@@ -107,7 +107,7 @@ export default function EditProfilePage() {
         orderByChild('email'),
         equalTo(session.user.email)
       );
-      
+
       const snapshot = await get(authQuery);
       if (snapshot.exists()) {
         const userKey = Object.keys(snapshot.val())[0];
@@ -123,7 +123,8 @@ export default function EditProfilePage() {
         throw new Error('User not found in database');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.warn('Profile update failed. Please check your connection and try again.');
+      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
     } finally {
       setLoading(false);
     }
@@ -153,7 +154,7 @@ export default function EditProfilePage() {
   return (
     <Box sx={{ maxWidth: 700, mx: 'auto', my: 6 }}>
       <StyledPaper elevation={3}>
-       
+
 
         <Box component="form" onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
@@ -257,23 +258,23 @@ export default function EditProfilePage() {
           />
 
           {error && (
-            <Alert 
-              severity="error" 
-              sx={{ 
-                mt: 2, 
+            <Alert
+              severity="error"
+              sx={{
+                mt: 2,
                 borderRadius: '8px',
                 backgroundColor: '#330000',
                 color: '#ff9999',
               }}
             >
-              {error}
+              ⚠️ {error}
             </Alert>
           )}
           {success && (
-            <Alert 
-              severity="success" 
-              sx={{ 
-                mt: 2, 
+            <Alert
+              severity="success"
+              sx={{
+                mt: 2,
                 borderRadius: '8px',
                 backgroundColor: '#002200',
                 color: '#99ff99',

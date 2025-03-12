@@ -40,16 +40,16 @@ const PayrollPage: React.FC = () => {
       let errorMessage = 'Failed to fetch company info';
       if (axios.isAxiosError(err)) {
         if (err.response) {
-          errorMessage = err.response.data.error || 'Server error';
+          errorMessage = "Server error. Please try again later.";
         } else if (err.request) {
-          errorMessage = 'Network error: Unable to connect to the server';
+          errorMessage = "Network error. Check your internet connection.";
         } else {
-          errorMessage = err.message;
+          errorMessage = "Unexpected error. Please refresh and try again.";
         }
       } else {
         errorMessage = err.message || errorMessage;
       }
-      console.error('Error fetching company info:', err);
+      console.warn('Error fetching company info:');
       setError(errorMessage);
       setIsAuthenticated(false);
     } finally {
