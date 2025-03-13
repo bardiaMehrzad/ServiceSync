@@ -48,20 +48,20 @@ export default function JobsTable() {
 
     // Fetch employees
     // Fetch employees
-      onValue(employeesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const employeeList = Object.entries(data).map(([id, employee]: [string, any]) => ({
-            id,
-            name: employee.name,
-            phoneNumber: employee.phone,
-            ...employee,
-          }));
-          setEmployees(employeeList);
-        } else {
-          setEmployees([]);
-        }
-      });
+    onValue(employeesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const employeeList = Object.entries(data).map(([id, employee]: [string, any]) => ({
+          id,
+          name: employee.name,
+          phoneNumber: employee.phone,
+          ...employee,
+        }));
+        setEmployees(employeeList);
+      } else {
+        setEmployees([]);
+      }
+    });
 
   }, []);
 
@@ -91,7 +91,7 @@ export default function JobsTable() {
       await update(newJobRef, newJob);
       setOpenCreateDialog(false);
     } catch (error) {
-      console.error("Error creating job:", error);
+      console.warn("Job creation failed. Try again.");
     }
   };
 
@@ -120,7 +120,7 @@ export default function JobsTable() {
       );
       setOpenModifyDialog(false);
     } catch (error) {
-      console.error("Error updating job:", error);
+      console.warn("Job update failed. Check your connection and try again.");
     }
   };
   const handleEmployeeSelect = (employeeName: string) => {
@@ -134,12 +134,12 @@ export default function JobsTable() {
       status === buttonStatus
         ? "#333"
         : buttonStatus === "Assigned"
-        ? "#BFC1CD"
-        : buttonStatus === "Work in Progress"
-        ? "#ff9800"
-        : buttonStatus === "Completed"
-        ? "#4caf50"
-        : "#f44336",
+          ? "#BFC1CD"
+          : buttonStatus === "Work in Progress"
+            ? "#ff9800"
+            : buttonStatus === "Completed"
+              ? "#4caf50"
+              : "#f44336",
     color: "#fff",
     fontWeight: status === buttonStatus ? "bold" : "normal",
     borderRadius: "2px",
@@ -248,7 +248,7 @@ export default function JobsTable() {
         <DialogContent sx={{ minHeight: "420px", pt: "10px", backgroundColor: "#2c2c2c", color: "#fff" }}>
 
           <Box sx={{ mt: "30px" }}>
-           <Select
+            <Select
               fullWidth
               value={assignedTo}
               onChange={(e) => {
@@ -345,27 +345,27 @@ export default function JobsTable() {
             />
           </Box>
           <Box sx={{ mt: "15px" }}>
-          <Select
-            fullWidth
-            value={assignedTo}
-            onChange={(e) => {
-              setAssignedTo(e.target.value);
-              const selectedEmployee = employees.find(emp => emp.name === e.target.value);
-              setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
-            }}
-            variant="outlined"
-            displayEmpty
-            sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
-          >
-            <MenuItem value="" disabled>
-              Select Employee
-            </MenuItem>
-            {employees.map((employee) => (
-              <MenuItem key={employee.id} value={employee.name}>
-                {employee.name}
+            <Select
+              fullWidth
+              value={assignedTo}
+              onChange={(e) => {
+                setAssignedTo(e.target.value);
+                const selectedEmployee = employees.find(emp => emp.name === e.target.value);
+                setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
+              }}
+              variant="outlined"
+              displayEmpty
+              sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
+            >
+              <MenuItem value="" disabled>
+                Select Employee
               </MenuItem>
-            ))}
-          </Select>
+              {employees.map((employee) => (
+                <MenuItem key={employee.id} value={employee.name}>
+                  {employee.name}
+                </MenuItem>
+              ))}
+            </Select>
           </Box>
           <Box sx={{ mt: "15px" }}>
             <TextField

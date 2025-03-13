@@ -59,7 +59,7 @@ export function Calendar() {
           setTasks([]);
         }
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.warn('Failed to fetch tasks from Firebase. Please check your database connection.');
       }
     };
     fetchTasks();
@@ -96,9 +96,10 @@ export function Calendar() {
       await set(newTaskRef, newTaskData);
       setTasks([...tasks, { id: newTaskRef.key!, ...newTaskData }]);
       handleCloseAddDialog();
-    } catch (e) {
-      console.error('Error adding task: ', e);
+    } catch (error) {
+      console.warn('Could not add task. Please try again.');
     }
+
   };
 
 
@@ -140,8 +141,9 @@ export function Calendar() {
       setTasks(tasks.map((t) => (t.id === selectedTask.id ? updatedTask : t)));
       handleCloseModifyDialog();
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.warn('Task update failed. Ensure all fields are valid.');
     }
+
   };
 
   const handleOpenDeleteDialog = (task: Task) => {
@@ -163,10 +165,11 @@ export function Calendar() {
       handleCloseDeleteDialog(); // Close the delete dialog after deletion
       handleCloseModifyDialog(); // Close the modify dialog after deletion
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.warn('Task deletion unsuccessful. Please check if the task still exists.');
     }
+
   };
-  
+
 
   const handleEventClick = (arg: EventClickArg) => {
     const task = tasks.find((t) => t.id === arg.event.id);
@@ -190,7 +193,7 @@ export function Calendar() {
 
   return (
     <div style={{ padding: '20px' }}>
-      
+
 
       <FullCalendar
         height={400}
@@ -207,9 +210,9 @@ export function Calendar() {
         eventContent={renderEventContent}
         eventClick={handleEventClick}
       />
-  
-       {/* Add Task Dialog */}
-       <Dialog
+
+      {/* Add Task Dialog */}
+      <Dialog
         open={openAddDialog}
         onClose={handleCloseAddDialog}
         PaperProps={{
@@ -291,7 +294,7 @@ export function Calendar() {
           <Button type="submit">Add Task</Button>
         </DialogActions>
       </Dialog>
-     
+
 
       {/* Modify Task Dialog */}
       <Dialog
@@ -372,7 +375,7 @@ export function Calendar() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModifyDialog}>Cancel</Button>
-          <Button onClick={() => selectedTask && handleOpenDeleteDialog(selectedTask) && {handleCloseModifyDialog}} color="error">
+          <Button onClick={() => selectedTask && handleOpenDeleteDialog(selectedTask) && { handleCloseModifyDialog }} color="error">
             Delete
           </Button>
           <Button type="submit">Save Changes</Button>
@@ -395,7 +398,7 @@ export function Calendar() {
       <Button variant="contained" onClick={handleOpenAddDialog} style={{ marginTop: '20px' }}>
         Add New Task
       </Button>
-      
+
 
     </div>
   );

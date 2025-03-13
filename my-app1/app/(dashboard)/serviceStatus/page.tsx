@@ -27,13 +27,15 @@ export default function ServiceStatusPage() {
         const calendarDBRef = ref(db, "ServiceSync");
         const calendarSnapshot = await get(calendarDBRef);
         setCalendarDBStatus(calendarSnapshot.exists() ? "online" : "offline");
+        console.log(`Calendar DB Status: ${calendarDBStatus}`);
 
         // 2. Jobs DB connectivity (using Firebase Realtime Database)
         const jobsDBRef = ref(db, "jobs");
         const jobsSnapshot = await get(jobsDBRef);
         setJobsDBStatus(jobsSnapshot.exists() ? "online" : "offline");
+        console.log(`Jobs DB Status: ${jobsDBStatus}`);
       } catch (error) {
-        console.error("Error checking service status:", error);
+        console.warn("Database check failed. Some services may be offline. Error details:", error);
         setCalendarDBStatus("offline");
         setJobsDBStatus("offline");
       }
@@ -148,8 +150,8 @@ export default function ServiceStatusPage() {
                   {calendarDBStatus === "online"
                     ? "Calendar database is running normally."
                     : calendarDBStatus === "offline"
-                    ? "Calendar database is unavailable."
-                    : "Please wait while we check the status..."}
+                      ? "Calendar database is unavailable."
+                      : "Please wait while we check the status..."}
                 </Typography>
               </CardContent>
             </Card>
@@ -210,8 +212,8 @@ export default function ServiceStatusPage() {
                   {jobsDBStatus === "online"
                     ? "Jobs database is running normally."
                     : jobsDBStatus === "offline"
-                    ? "Jobs database is unavailable."
-                    : "Please wait while we check the status..."}
+                      ? "Jobs database is unavailable."
+                      : "Please wait while we check the status..."}
                 </Typography>
               </CardContent>
             </Card>

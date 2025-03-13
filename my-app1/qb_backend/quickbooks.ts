@@ -1,5 +1,8 @@
+/// <reference types="node" />
+
 import { Router, Request, Response } from 'express';
 import OAuthClient from 'intuit-oauth';
+import process from 'process';
 
 interface Token {
   realmId: string;
@@ -31,8 +34,9 @@ router.get('/auth', (req: Request, res: Response) => {
     });
     res.redirect(authUri);
   } catch (error: any) {
-    console.error('Error generating auth URI:', error);
-    res.status(500).send('Failed to initiate QuickBooks auth: ' + error.message);
+    console.error('Failed to generate QuickBooks auth URI:', error instanceof Error ? error.message : error);
+    res.status(500).send('Failed to initiate QuickBooks auth.');
+
   }
 });
 
@@ -45,8 +49,9 @@ router.get('/callback', async (req: Request, res: Response) => {
     console.log('Token received:', tokenData);
     res.redirect('http://localhost:3000/payroll');
   } catch (error: any) {
-    console.error('Error in callback route:', error);
-    res.status(400).send('Error during QuickBooks OAuth callback: ' + error.message);
+    console.error('OAuth callback error:', error instanceof Error ? error.message : error);
+    res.status(400).send('QuickBooks authentication failed.');
+
   }
 });
 
@@ -70,8 +75,9 @@ router.get('/company-info', async (req: Request, res: Response) => {
 
     res.json(JSON.parse(apiResponse.text()));
   } catch (error: any) {
-    console.error('Error fetching company info:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Failed to retrieve company info:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Could not fetch QuickBooks company data.' });
+
   }
 });
 
