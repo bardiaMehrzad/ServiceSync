@@ -11,7 +11,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import { useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import { ref, get } from "firebase/database"; // Firebase imports
-import { db } from "../../../auth"; // Ensure this path matches your Firebase config
+import { db } from "../editProfile/lib/firebase"; // Ensure this path matches your Firebase config
 
 export default function ServiceStatusPage() {
   const [appStatus, setAppStatus] = React.useState<"online" | "offline">("online"); // Always online
