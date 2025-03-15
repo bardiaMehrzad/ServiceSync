@@ -4,16 +4,7 @@ import type { Provider } from 'next-auth/providers';
 import { initializeApp } from 'firebase/app';
 import { ref, query, getDatabase, orderByChild, equalTo, get } from 'firebase/database';
 import { use } from 'react';
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-};
+import { db } from './app/(dashboard)/editProfile/lib/firebase'
 
 interface User {
   name: string;
@@ -22,9 +13,12 @@ interface User {
   email: string;
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getDatabase(app);
+// This is the db name assigned in the firebase.ts file.
+if (db.app.name != 'service_sync') {
+  //This is an error, the db should already be loaded and not unloaded.
+  console.error('Error, program says db is not loaded.');
+  throw new Error('Database is not loading properly refer to duplicate declarations of db in application.');
+}
 
 async function findAuthEntry(email: string, password: string): Promise<boolean> {
   try {
