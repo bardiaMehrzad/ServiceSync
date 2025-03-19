@@ -28,6 +28,8 @@ export default function JobsTable() {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [dateTime, setDateTime] = React.useState("");
   const [status, setStatus] = React.useState("Assigned");
+  const [description, setDescription] = React.useState("");
+
 
   const mountedRef = React.useRef(false);
 
@@ -95,7 +97,7 @@ export default function JobsTable() {
       off(employeesRef, "value", handleEmployeesSnapshot);
     };
   }, []);
-  
+
 
   const formatPhoneNumber = (input: string) => {
     const numbers = input.replace(/\D/g, "");
@@ -136,6 +138,7 @@ export default function JobsTable() {
     setPhoneNumber(job.phoneNumber || employees.find(emp => emp.name === job.assignedTo)?.phoneNumber || "");
     setDateTime(job.dateTime);
     setStatus(job.status);
+    setDescription(job.description || "");
     setOpenModifyDialog(true);
   };
 
@@ -144,11 +147,11 @@ export default function JobsTable() {
 
     const jobRef = ref(db, `jobs/${selectedJob.id}`);
     try {
-      await update(jobRef, { jobType, assignedTo, address, phoneNumber, dateTime, status });
+      await update(jobRef, { jobType, assignedTo, address, phoneNumber, dateTime, status, description });
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
           job.id === selectedJob.id
-            ? { ...job, jobType, assignedTo, address, phoneNumber, dateTime, status }
+            ? { ...job, jobType, assignedTo, address, phoneNumber, dateTime, status, description }
             : job
         )
       );
@@ -201,8 +204,18 @@ export default function JobsTable() {
         return <span>{formattedDate}</span>;
       },
     },
-    
+
     { field: "phoneNumber", headerName: "Phone Number", width: 150 },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 250,
+      renderCell: (params) => (
+        <span style={{ whiteSpace: "pre-wrap", overflowWrap: "break-word" }}>
+          {params.value || "No description"}
+        </span>
+      ),
+    },
     {
       field: "status",
       headerName: "Status",
@@ -339,7 +352,7 @@ export default function JobsTable() {
               value={dateTime}
               onChange={(e) => setDateTime(e.target.value)}
               variant="outlined"
-              InputLabelProps={{ style: { color: "#fff" }, shrink: true}}
+              InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
               InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
             />
           </Box>
@@ -349,6 +362,19 @@ export default function JobsTable() {
               label="Phone Number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+              variant="outlined"
+              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
+              InputLabelProps={{ style: { color: "#fff" } }}
+            />
+          </Box>
+          <Box sx={{ mt: "30px" }}>
+            <TextField
+              fullWidth
+              label="Job Description"
+              multiline
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               variant="outlined"
               InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
               InputLabelProps={{ style: { color: "#fff" } }}
@@ -448,7 +474,7 @@ export default function JobsTable() {
               value={dateTime}
               onChange={(e) => setDateTime(e.target.value)}
               variant="outlined"
-              InputLabelProps={{ style: { color: "#fff" }, shrink: true}}
+              InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
               InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
             />
           </Box>
