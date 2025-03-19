@@ -438,7 +438,7 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
       />
       <DataGrid
         checkboxSelection
-        rows={filteredJobs}
+        rows={filteredJobs.slice(0,100)}
         columns={columns}
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
         initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
