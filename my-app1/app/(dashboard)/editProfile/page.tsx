@@ -116,6 +116,7 @@ export default function EditProfilePage() {
         await update(userRef, {
           name: userData.name,
           image: userData.image,
+          email: userData.email,
         });
 
         setSuccess(true);
@@ -130,32 +131,9 @@ export default function EditProfilePage() {
     }
   };
 
-  if (!session) {
-    return (
-      <Box sx={{ maxWidth: 600, mx: 'auto', my: 4 }}>
-        <Alert severity="warning" sx={{ backgroundColor: '#332200', color: '#ffcc00' }}>
-          Please sign in to edit your profile
-        </Alert>
-      </Box>
-    );
-  }
-
-  if (loading && !userData.email) {
-    return (
-      <Box sx={{ maxWidth: 600, mx: 'auto', my: 4 }}>
-        <LinearProgress sx={{ backgroundColor: '#404040', '& .MuiLinearProgress-bar': { backgroundColor: '#ffffff' } }} />
-        <Typography sx={{ mt: 2, textAlign: 'center', color: '#ffffff' }}>
-          Loading profile...
-        </Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ maxWidth: 700, mx: 'auto', my: 6 }}>
       <StyledPaper elevation={3}>
-
-
         <Box component="form" onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
             <StyledAvatar
@@ -166,131 +144,15 @@ export default function EditProfilePage() {
             </StyledAvatar>
           </Box>
 
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={userData.name}
-            onChange={handleChange}
-            margin="normal"
-            required
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: '#333333',
-                color: '#ffffff',
-                '& fieldset': {
-                  borderColor: '#666666',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#888888',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#ffffff',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: '#aaaaaa',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#ffffff',
-              },
-            }}
-          />
+          <TextField fullWidth label="Name" name="name" value={userData.name} onChange={handleChange} margin="normal" required variant="outlined" />
+          <TextField fullWidth label="Profile Image URL" name="image" value={userData.image} onChange={handleChange} margin="normal" variant="outlined" helperText="Enter a valid image URL" />
+          <TextField fullWidth label="Email" name="email" value={userData.email} onChange={handleChange} margin="normal" required variant="outlined" />
 
-          <TextField
-            fullWidth
-            label="Profile Image URL"
-            name="image"
-            value={userData.image}
-            onChange={handleChange}
-            margin="normal"
-            helperText="Enter a valid image URL"
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: '#333333',
-                color: '#ffffff',
-                '& fieldset': {
-                  borderColor: '#666666',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#888888',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#ffffff',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: '#aaaaaa',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#ffffff',
-              },
-              '& .MuiFormHelperText-root': {
-                color: '#aaaaaa',
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Email"
-            value={userData.email}
-            margin="normal"
-            disabled
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: '#2a2a2a',
-                color: '#aaaaaa',
-                '& fieldset': {
-                  borderColor: '#666666',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: '#aaaaaa',
-              },
-            }}
-          />
-
-          {error && (
-            <Alert
-              severity="error"
-              sx={{
-                mt: 2,
-                borderRadius: '8px',
-                backgroundColor: '#330000',
-                color: '#ff9999',
-              }}
-            >
-              ⚠️ {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert
-              severity="success"
-              sx={{
-                mt: 2,
-                borderRadius: '8px',
-                backgroundColor: '#002200',
-                color: '#99ff99',
-              }}
-            >
-              Profile updated successfully!
-            </Alert>
-          )}
+          {error && <Alert severity="error">⚠️ {error}</Alert>}
+          {success && <Alert severity="success">Profile updated successfully! Please logout and login if you changed your email!</Alert>}
 
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <StyledButton
-              type="submit"
-              variant="contained"
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-            >
+            <StyledButton type="submit" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}>
               {loading ? 'Saving...' : 'Save Changes'}
             </StyledButton>
           </Box>
