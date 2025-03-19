@@ -67,12 +67,10 @@ export default function CreateJobDialog({ open, onClose }: CreateJobDialogProps)
         <TextField required margin="normal" label="Assigned To" fullWidth value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} />
         <TextField required margin="normal" label="Address" fullWidth value={address} onChange={(e) => setAddress(e.target.value)} />
         <TextField required margin="normal" label="Phone Number" fullWidth value={phoneNumber} onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))} />
-        <TextField
-          required
+        <TextField required
           margin="normal"
           label="Job Description"
-          fullWidth
-          multiline
+          fullWidth multiline
           rows={3}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
