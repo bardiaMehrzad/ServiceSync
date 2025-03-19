@@ -29,6 +29,8 @@ export default function JobsTable() {
   const [dateTime, setDateTime] = React.useState("");
   const [status, setStatus] = React.useState("Assigned");
   const [description, setDescription] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
+
 
 
   const mountedRef = React.useRef(false);
@@ -275,15 +277,33 @@ export default function JobsTable() {
     },
   ];
 
+  const filteredJobs = jobs.filter((job) =>
+    Object.values(job).some((value) =>
+      String(value).toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Button variant="contained" color="primary" onClick={handleCreateJob} sx={{ mb: 2 }}>
         Create a new job
       </Button>
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search jobs..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
+        sx={{
+          mb: 2,
+          backgroundColor: "#1c1c1c",
+          input: { color: "#fff" },
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
+        }}
+      />
 
       <DataGrid
         checkboxSelection
-        rows={jobs}
+        rows={filteredJobs}
         columns={columns}
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
         initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
@@ -298,6 +318,7 @@ export default function JobsTable() {
         disableColumnResize
         density="compact"
       />
+
 
       {/* Modify Job Dialog */}
       <Dialog
