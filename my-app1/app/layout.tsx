@@ -11,7 +11,7 @@ import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '../auth';
 import theme from '../theme';
 import Copyright from './Copyright';
-import { AdminPanelSettingsRounded, CalendarMonthRounded, CloudSyncRounded, EditCalendarRounded, Event, HelpCenterRounded, HomeMaxRounded, Logout, ManageAccountsOutlined, ManageAccountsRounded, MonetizationOn, PeopleAltRounded, PeopleOutlined, PrecisionManufacturingOutlined, PriceCheckRounded, ReceiptLongRounded, Schedule, Work, WorkHistoryOutlined } from '@mui/icons-material';
+import { AdminPanelSettingsRounded, CalendarMonthRounded, CloudSyncRounded, EditCalendarRounded, Event, HelpCenterRounded, HomeMaxRounded, Logout, ManageAccountsOutlined, ManageAccountsRounded, MonetizationOn, PeopleAltRounded, PeopleOutlined, PrecisionManufacturingOutlined, PriceCheckRounded, ReceiptLongRounded, Schedule, Work, WorkHistoryOutlined, AddCircleOutline as AddCircleOutlineIcon, DomainAdd, AddTask } from '@mui/icons-material';
 
 const NAVIGATION: Navigation = [
   {
@@ -28,6 +28,24 @@ const NAVIGATION: Navigation = [
     title: 'Calendar',
     icon: <EditCalendarRounded />,
   },
+  
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Job Management',
+  },
+  {
+    segment: 'jobs',
+    title: 'Manage Jobs',
+    icon: <AddTask/>,
+  },
+  {
+    segment: 'jobstatus',
+    title: 'Jobs Status',
+    icon: <WorkHistoryOutlined />,
+  },
   {
     kind: 'divider',
   },
@@ -36,16 +54,11 @@ const NAVIGATION: Navigation = [
     title: 'Employee Management',
   },
   {
-    segment: 'jobs',
-    title: 'Jobs',
-    icon: <WorkHistoryOutlined />,
-  },
-  {
     segment: 'eManagement',
     title: 'Modify Employees',
     icon: <AdminPanelSettingsRounded />,
   },
-  
+
   {
     kind: 'divider',
   },

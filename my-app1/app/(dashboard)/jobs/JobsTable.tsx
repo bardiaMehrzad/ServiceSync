@@ -18,6 +18,8 @@ import { useNotifications } from "@toolpad/core";
 import * as XLSX from "xlsx";
 import debounce from "lodash/debounce"; // npm install lodash
 import dynamic from "next/dynamic"; // Import dynamic for Next.js
+import AddCircleOutline from "@mui/icons-material/AddCircleOutline"; // Icon for Create Job
+import FileDownload from "@mui/icons-material/FileDownload"; // Icon for Export to Excel
 
 const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableContent() {
   const [jobs, setJobs] = React.useState<any[]>([]);
@@ -101,6 +103,19 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
       off(employeesRef, "value", handleEmployeesSnapshot);
     };
   }, [isLoading]); // Dependency on isLoading to re-run if needed
+
+  // Listen for export event from JobsPage
+  React.useEffect(() => {
+    const handleExport = () => {
+      handleExportClick();
+    };
+
+    window.addEventListener("exportToExcel", handleExport);
+
+    return () => {
+      window.removeEventListener("exportToExcel", handleExport);
+    };
+  }, []);
 
   const formatPhoneNumber = (input: string) => {
     const numbers = input.replace(/\D/g, "");
@@ -244,14 +259,15 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
 
   const columns: GridColDef[] = React.useMemo(
     () => [
-      { field: "id", headerName: "Job ID", width: 150 },
-      { field: "jobType", headerName: "Job Type", width: 200 },
-      { field: "assignedTo", headerName: "Assigned To", width: 150 },
-      { field: "address", headerName: "Address", width: 200 },
+      { field: "id", headerName: "Job ID", flex: 1, minWidth: 150 },
+      { field: "jobType", headerName: "Job Type", flex: 1, minWidth: 200 },
+      { field: "assignedTo", headerName: "Assigned To", flex: 1, minWidth: 150 },
+      { field: "address", headerName: "Address", flex: 1, minWidth: 200 },
       {
         field: "dateTime",
         headerName: "Date",
-        width: 200,
+        flex: 1,
+        minWidth: 200,
         renderCell: (params) => {
           const date = new Date(params.value);
           return isNaN(date.getTime()) ? (
@@ -261,11 +277,12 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
           );
         },
       },
-      { field: "phoneNumber", headerName: "Phone Number", width: 150 },
+      { field: "phoneNumber", headerName: "Phone Number", flex: 1, minWidth: 150 },
       {
         field: "description",
         headerName: "Description",
-        width: 250,
+        flex: 1,
+        minWidth: 250,
         renderCell: (params) => (
           <span style={{ whiteSpace: "pre-wrap", overflowWrap: "break-word" }}>
             {params.value || "No description"}
@@ -275,7 +292,8 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
       {
         field: "status",
         headerName: "Status",
-        width: 120,
+        flex: 1,
+        minWidth: 120,
         renderCell: (params) => {
           const statusValue = params.value as string;
           const [backgroundColor, textColor] =
@@ -310,7 +328,8 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
       {
         field: "actions",
         headerName: "Actions",
-        width: 120,
+        flex: 1,
+        minWidth: 120,
         renderCell: (params) => (
           <Button
             variant="contained"
@@ -415,11 +434,23 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-        <Button variant="contained" color="primary" onClick={handleCreateJob} sx={{ mr: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreateJob}
+          startIcon={<AddCircleOutline />}
+          sx={{ borderRadius: "4px", padding: "6px 12px" }}
+        >
           Create a new job
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleExportClick}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleExportClick}
+          startIcon={<FileDownload />}
+          sx={{ borderRadius: "4px", padding: "6px 12px" }}
+        >
           Export to Excel
         </Button>
       </Box>
@@ -441,7 +472,7 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
         rows={filteredJobs.slice(0,100)}
         columns={columns}
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
-        initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
+        initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         sx={(theme) => ({
           backgroundColor: "#1c1c1c",
           borderColor: theme.palette.mode === "dark" ? "#333" : "#e0e0e0",
@@ -449,7 +480,7 @@ const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableCon
           "& .MuiDataGrid-columnHeaders": { backgroundColor: "#2c2c2c", borderColor: "#333" },
           "& .MuiDataGrid-footerContainer": { color: "#fff", borderColor: "#333" },
         })}
-        pageSizeOptions={[10, 20, 50]}
+        pageSizeOptions={[10,20,30]}
         disableColumnResize
         density="compact"
         getRowId={(row) => row.id}

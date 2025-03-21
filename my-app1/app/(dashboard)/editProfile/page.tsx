@@ -17,6 +17,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
+import Loader from '../Loader';
+import theme from '@/theme';
 
 interface UserData {
   name: string;
@@ -72,7 +74,9 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
+  
   useEffect(() => {
     if (session?.user) {
       setUserData({
@@ -81,8 +85,19 @@ export default function EditProfilePage() {
         email: session.user.email || '',
       });
       setLoading(false);
+
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
+  
+      return () => clearTimeout(timer);
     }
   }, [session]);
+  
+    // Display loader while loading
+    if (isLoading) {
+      return <Loader size={60} color={theme.palette.primary.main} />; // Use theme primary color for loader
+    }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
