@@ -1,7 +1,8 @@
-"use client";
+"use client"; // Ensure this is at the top to mark as a Client Component
 import * as React from "react";
-import { getDatabase, ref, onValue, update, push } from "firebase/database";
+import { DataSnapshot, ref, onValue, off, runTransaction, set, update } from "firebase/database";
 import { db } from "./lib/firebase";
+import { format } from "date-fns";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -13,56 +14,107 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import { useNotifications } from "@toolpad/core";
+import * as XLSX from "xlsx";
+import debounce from "lodash/debounce"; // npm install lodash
+import dynamic from "next/dynamic"; // Import dynamic for Next.js
+import AddCircleOutline from "@mui/icons-material/AddCircleOutline"; // Icon for Create Job
+import FileDownload from "@mui/icons-material/FileDownload"; // Icon for Export to Excel
 
-export default function JobsTable() {
+const JobsTable = dynamic(() => Promise.resolve(React.memo(function JobsTableContent() {
   const [jobs, setJobs] = React.useState<any[]>([]);
-  const [employees, setEmployees] = React.useState<any[]>([]); // New state for employees
+  const [employees, setEmployees] = React.useState<any[]>([]);
   const [selectedJob, setSelectedJob] = React.useState<any>(null);
   const [openModifyDialog, setOpenModifyDialog] = React.useState(false);
   const [openCreateDialog, setOpenCreateDialog] = React.useState(false);
-
+  const [openDateRangeDialog, setOpenDateRangeDialog] = React.useState(false);
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
   const [jobType, setJobType] = React.useState("");
   const [assignedTo, setAssignedTo] = React.useState("");
   const [address, setAddress] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [dateTime, setDateTime] = React.useState("");
   const [status, setStatus] = React.useState("Assigned");
+  const [description, setDescription] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true); // Add loading state
 
-  // Fetch jobs and employees from Firebase in real-time
+  const mountedRef = React.useRef(false);
+  const notifications = useNotifications();
+
+  // Generate the next job ID with leading zeros
+  const getNextJobId = async () => {
+    const lastIdRef = ref(db, "lastJobId");
+    return runTransaction(lastIdRef, (currentId) => {
+      let nextId = 0;
+      if (currentId === null) nextId = 0;
+      else nextId = parseInt(currentId, 10) + 1;
+      return nextId.toString().padStart(3, "0");
+    })
+      .then((result) => (result.committed ? result.snapshot.val() : Promise.reject(new Error("Transaction failed"))))
+      .catch((error) => {
+        console.error("Error generating next job ID:", error);
+        throw error;
+      });
+  };
+
   React.useEffect(() => {
+    mountedRef.current = true;
+
     const jobsRef = ref(db, "jobs");
     const employeesRef = ref(db, "employees");
 
-    // Fetch jobs
-    onValue(jobsRef, (snapshot) => {
+    const handleJobsSnapshot = (snapshot: DataSnapshot) => {
+      if (!mountedRef.current) return;
       const data = snapshot.val();
-      if (data) {
-        const jobList = Object.entries(data).map(([id, job]) => ({
-          id,
-          ...(job as object),
-        }));
+      const jobList = data
+        ? Object.entries(data).map(([id, job]) => ({ id, ...(job as object) }))
+        : [];
+      if (mountedRef.current) {
         setJobs(jobList);
-      } else {
-        setJobs([]);
+        if (isLoading) setIsLoading(false); // Set loading to false after first data load
       }
-    });
+    };
 
-    // Fetch employees
-    // Fetch employees
-    onValue(employeesRef, (snapshot) => {
+    const handleEmployeesSnapshot = (snapshot: DataSnapshot) => {
+      if (!mountedRef.current) return;
       const data = snapshot.val();
-      if (data) {
-        const employeeList = Object.entries(data).map(([id, employee]: [string, any]) => ({
-          id,
-          name: employee.name,
-          phoneNumber: employee.phone,
-          ...employee,
-        }));
+      const employeeList = data
+        ? Object.entries(data).map(([id, employee]: [string, any]) => ({
+            id,
+            name: employee.name,
+            phoneNumber: employee.phone,
+            ...employee,
+          }))
+        : [];
+      if (mountedRef.current) {
         setEmployees(employeeList);
-      } else {
-        setEmployees([]);
+        if (isLoading) setIsLoading(false); // Set loading to false after first data load
       }
-    });
+    };
 
+    onValue(jobsRef, handleJobsSnapshot);
+    onValue(employeesRef, handleEmployeesSnapshot);
+
+    return () => {
+      mountedRef.current = false;
+      off(jobsRef, "value", handleJobsSnapshot);
+      off(employeesRef, "value", handleEmployeesSnapshot);
+    };
+  }, [isLoading]); // Dependency on isLoading to re-run if needed
+
+  // Listen for export event from JobsPage
+  React.useEffect(() => {
+    const handleExport = () => {
+      handleExportClick();
+    };
+
+    window.addEventListener("exportToExcel", handleExport);
+
+    return () => {
+      window.removeEventListener("exportToExcel", handleExport);
+    };
   }, []);
 
   const formatPhoneNumber = (input: string) => {
@@ -78,51 +130,109 @@ export default function JobsTable() {
     setAssignedTo("");
     setAddress("");
     setPhoneNumber("");
+    setDateTime("");
     setStatus("Assigned");
+    setDescription("");
+  };
+
+  const validateCreateFields = () => {
+    return jobType && assignedTo && address && phoneNumber && dateTime && description;
   };
 
   const handleSubmitJob = async () => {
-    if (!jobType || !assignedTo || !address || !phoneNumber) return;
-
-    const newJobRef = push(ref(db, "jobs"));
-    const newJob = { jobType, assignedTo, address, phoneNumber, status };
+    if (!validateCreateFields()) {
+      notifications.show("All required fields must be filled out.", {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
+      return;
+    }
 
     try {
-      await update(newJobRef, newJob);
+      const newJobId = await getNextJobId();
+      const jobRef = ref(db, `jobs/${newJobId}`);
+      await set(jobRef, {
+        id: newJobId,
+        jobType,
+        assignedTo,
+        address,
+        phoneNumber,
+        dateTime,
+        status,
+        description,
+      });
       setOpenCreateDialog(false);
+      notifications.show("Job created successfully!", {
+        severity: "success",
+        autoHideDuration: 3000,
+      });
     } catch (error) {
       console.warn("Job creation failed. Try again.");
+      notifications.show("Job creation failed. Try again.", {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
     }
   };
 
   const handleModify = (job: any) => {
     setSelectedJob(job);
-    setJobType(job.jobType);
-    setAssignedTo(job.assignedTo);
-    setAddress(job.address);
+    setJobType(job.jobType || "");
+    setAssignedTo(job.assignedTo || "");
+    setAddress(job.address || "");
     setPhoneNumber(job.phoneNumber || employees.find(emp => emp.name === job.assignedTo)?.phoneNumber || "");
-    setStatus(job.status);
+    setDateTime(job.dateTime || "");
+    setStatus(job.status || "Assigned");
+    setDescription(job.description || "");
     setOpenModifyDialog(true);
   };
 
+  const validateModifyFields = () => {
+    return jobType && assignedTo && address && phoneNumber && dateTime && description;
+  };
+
   const handleUpdateJob = async () => {
+    if (!validateModifyFields()) {
+      notifications.show("All required fields must be filled out.", {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
+      return;
+    }
+
     if (!selectedJob) return;
 
     const jobRef = ref(db, `jobs/${selectedJob.id}`);
     try {
-      await update(jobRef, { jobType, assignedTo, address, phoneNumber, status });
+      await update(jobRef, {
+        id: selectedJob.id,
+        jobType,
+        assignedTo,
+        address,
+        phoneNumber,
+        dateTime,
+        status,
+        description,
+      });
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
-          job.id === selectedJob.id
-            ? { ...job, jobType, assignedTo, address, phoneNumber, status }
-            : job
+          job.id === selectedJob.id ? { ...job, jobType, assignedTo, address, phoneNumber, dateTime, status, description } : job
         )
       );
       setOpenModifyDialog(false);
+      notifications.show("Job updated successfully!", {
+        severity: "success",
+        autoHideDuration: 3000,
+      });
     } catch (error) {
       console.warn("Job update failed. Check your connection and try again.");
+      notifications.show("Job update failed. Check your connection and try again.", {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
     }
   };
+
   const handleEmployeeSelect = (employeeName: string) => {
     setAssignedTo(employeeName);
     const selectedEmployee = employees.find(emp => emp.name === employeeName);
@@ -147,83 +257,222 @@ export default function JobsTable() {
     fontSize: "0.75rem",
   });
 
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "Job ID", width: 150 },
-    { field: "jobType", headerName: "Job Type", width: 200 },
-    { field: "assignedTo", headerName: "Assigned To", width: 150 },
-    { field: "address", headerName: "Address", width: 200 },
-    { field: "phoneNumber", headerName: "Phone Number", width: 150 },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) => {
-        const statusValue = params.value as string;
-        let backgroundColor, textColor;
-        switch (statusValue) {
-          case "Assigned":
-            backgroundColor = "#BFC1CD";
-            textColor = "#fff";
-            break;
-          case "Work in Progress":
-            backgroundColor = "#ff9800";
-            textColor = "#fff";
-            break;
-          case "Completed":
-            backgroundColor = "#4caf50";
-            textColor = "#fff";
-            break;
-          case "Cancelled":
-            backgroundColor = "#f44336";
-            textColor = "#fff";
-            break;
-          default:
-            backgroundColor = "#fff";
-            textColor = "#000";
-        }
-        const statusStyle = {
-          backgroundColor,
-          color: textColor,
-          padding: "2px 15px",
-          borderRadius: "2px",
-          alignItems: "center",
-          justifyContent: "center",
-          display: "flex",
-          fontWeight: "bold",
-          fontSize: "0.70rem",
-        };
-        return <span style={statusStyle}>{statusValue}</span>;
+  const columns: GridColDef[] = React.useMemo(
+    () => [
+      { field: "id", headerName: "Job ID", flex: 1, minWidth: 150 },
+      { field: "jobType", headerName: "Job Type", flex: 1, minWidth: 200 },
+      { field: "assignedTo", headerName: "Assigned To", flex: 1, minWidth: 150 },
+      { field: "address", headerName: "Address", flex: 1, minWidth: 200 },
+      {
+        field: "dateTime",
+        headerName: "Date",
+        flex: 1,
+        minWidth: 200,
+        renderCell: (params) => {
+          const date = new Date(params.value);
+          return isNaN(date.getTime()) ? (
+            <span>Invalid Date</span>
+          ) : (
+            <span>{format(date, "MMM dd, yyyy hh:mm a")}</span>
+          );
+        },
       },
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 120,
-      renderCell: (params) => (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleModify(params.row)}
-          sx={{ borderRadius: "2px", padding: "2px 6px", fontSize: "0.75rem", minWidth: "60px" }}
-        >
-          Modify
-        </Button>
-      ),
-    },
-  ];
+      { field: "phoneNumber", headerName: "Phone Number", flex: 1, minWidth: 150 },
+      {
+        field: "description",
+        headerName: "Description",
+        flex: 1,
+        minWidth: 250,
+        renderCell: (params) => (
+          <span style={{ whiteSpace: "pre-wrap", overflowWrap: "break-word" }}>
+            {params.value || "No description"}
+          </span>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 1,
+        minWidth: 120,
+        renderCell: (params) => {
+          const statusValue = params.value as string;
+          const [backgroundColor, textColor] =
+            statusValue === "Assigned"
+              ? ["#BFC1CD", "#fff"]
+              : statusValue === "Work in Progress"
+                ? ["#ff9800", "#fff"]
+                : statusValue === "Completed"
+                  ? ["#4caf50", "#fff"]
+                  : statusValue === "Cancelled"
+                    ? ["#f44336", "#fff"]
+                    : ["#fff", "#000"];
+          return (
+            <span
+              style={{
+                backgroundColor,
+                color: textColor,
+                padding: "2px 15px",
+                borderRadius: "2px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: "0.70rem",
+              }}
+            >
+              {statusValue}
+            </span>
+          );
+        },
+      },
+      {
+        field: "actions",
+        headerName: "Actions",
+        flex: 1,
+        minWidth: 120,
+        renderCell: (params) => (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleModify(params.row)}
+            sx={{ borderRadius: "2px", padding: "2px 6px", fontSize: "0.75rem", minWidth: "60px" }}
+          >
+            Modify
+          </Button>
+        ),
+      },
+    ],
+    [status]
+  );
+
+  const filteredJobs = React.useMemo(() => {
+    return jobs.filter((job) =>
+      Object.values(job).some((value) =>
+        String(value).toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [jobs, searchQuery]);
+
+  const debouncedSetSearchQuery = React.useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+      }, 300),
+    []
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSetSearchQuery(e.target.value);
+  };
+
+  React.useEffect(() => {
+    return () => {
+      debouncedSetSearchQuery.cancel();
+    };
+  }, [debouncedSetSearchQuery]);
+
+  const exportToExcel = () => {
+    const jobsToExport = filteredJobs.filter((job) => {
+      const jobDate = new Date(job.dateTime);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+
+      if (start && end) return jobDate >= start && jobDate <= end;
+      else if (start) return jobDate >= start;
+      else if (end) return jobDate <= end;
+      return true;
+    });
+
+    if (jobsToExport.length === 0) {
+      notifications.show("No data available for the selected date range.", {
+        severity: "warning",
+        autoHideDuration: 3000,
+      });
+      return;
+    }
+
+    const data = jobsToExport.map((job) => ({
+      "Job ID": job.id || "N/A",
+      "Job Type": job.jobType || "N/A",
+      "Assigned To": job.assignedTo || "N/A",
+      "Address": job.address || "N/A",
+      "Date": job.dateTime ? format(new Date(job.dateTime), "MMM dd, yyyy hh:mm a") : "Invalid Date",
+      "Phone Number": job.phoneNumber || "N/A",
+      "Description": job.description || "N/A",
+      "Status": job.status || "N/A",
+    }));
+
+    console.log("Data prepared for Excel:", data);
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Jobs");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `jobs_data_${format(new Date(), "yyyyMMdd")}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    notifications.show("Excel file exported successfully!", {
+      severity: "success",
+      autoHideDuration: 3000,
+    });
+    setOpenDateRangeDialog(false);
+  };
+
+  const handleExportClick = () => {
+    setOpenDateRangeDialog(true);
+    setStartDate("");
+    setEndDate("");
+  };
+
+  if (isLoading) return <div>Loading...</div>; // Render loading state until data is ready
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Button variant="contained" color="primary" onClick={handleCreateJob} sx={{ mb: 2 }}>
-        Create a new job
-      </Button>
-
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreateJob}
+          startIcon={<AddCircleOutline />}
+          sx={{ borderRadius: "4px", padding: "6px 12px" }}
+        >
+          Create a new job
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleExportClick}
+          startIcon={<FileDownload />}
+          sx={{ borderRadius: "4px", padding: "6px 12px" }}
+        >
+          Export to Excel
+        </Button>
+      </Box>
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search jobs..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        sx={{
+          mb: 2,
+          backgroundColor: "#1c1c1c",
+          input: { color: "#fff" },
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
+        }}
+      />
       <DataGrid
         checkboxSelection
-        rows={jobs}
+        rows={filteredJobs.slice(0,100)}
         columns={columns}
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
-        initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
+        initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         sx={(theme) => ({
           backgroundColor: "#1c1c1c",
           borderColor: theme.palette.mode === "dark" ? "#333" : "#e0e0e0",
@@ -231,69 +480,118 @@ export default function JobsTable() {
           "& .MuiDataGrid-columnHeaders": { backgroundColor: "#2c2c2c", borderColor: "#333" },
           "& .MuiDataGrid-footerContainer": { color: "#fff", borderColor: "#333" },
         })}
-        pageSizeOptions={[10, 20, 50]}
+        pageSizeOptions={[10,20,30]}
         disableColumnResize
         density="compact"
+        getRowId={(row) => row.id}
       />
-
       {/* Modify Job Dialog */}
       <Dialog
         open={openModifyDialog}
         onClose={() => setOpenModifyDialog(false)}
-        maxWidth="sm"
+        maxWidth="lg"
         fullWidth
-        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+        PaperProps={{ style: { backgroundColor: "#1a1a1a", color: "#fff" } }}
       >
-        <DialogTitle sx={{ mb: "2px", color: "#fff" }}>Modify Job</DialogTitle>
-        <DialogContent sx={{ minHeight: "420px", pt: "10px", backgroundColor: "#2c2c2c", color: "#fff" }}>
-
-          <Box sx={{ mt: "30px" }}>
-            <Select
-              fullWidth
-              value={assignedTo}
-              onChange={(e) => {
-                setAssignedTo(e.target.value);
-                const selectedEmployee = employees.find(emp => emp.name === e.target.value);
-                setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
-              }}
-              variant="outlined"
-              displayEmpty
-              sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
-            >
-              <MenuItem value="" disabled>
-                Select Employee
-              </MenuItem>
-              {employees.map((employee) => (
-                <MenuItem key={employee.id} value={employee.name}>
-                  {employee.name}
+        <DialogTitle sx={{ mb: 1, color: "#fff", fontSize: "1.25rem" }}>Modify Job</DialogTitle>
+        <DialogContent sx={{ pt: 2, backgroundColor: "#1a1a1a", color: "#fff" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Assigned To <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <Select
+                fullWidth
+                value={assignedTo}
+                onChange={(e) => {
+                  setAssignedTo(e.target.value as string);
+                  const selectedEmployee = employees.find(emp => emp.name === e.target.value);
+                  setPhoneNumber(selectedEmployee?.phoneNumber || "");
+                }}
+                variant="outlined"
+                displayEmpty
+                required
+                sx={{
+                  backgroundColor: "#2c2c2c",
+                  ".MuiOutlinedInput-notchedOutline": { borderColor: "#555" },
+                  "& .MuiSelect-select": { color: "#fff" },
+                }}
+              >
+                <MenuItem value="" disabled>
+                  Select Employee
                 </MenuItem>
-              ))}
-            </Select>
+                {employees.map((employee) => (
+                  <MenuItem key={employee.id} value={employee.name}>
+                    {employee.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Date <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                type="datetime-local"
+                value={dateTime || ""}
+                onChange={(e) => setDateTime(e.target.value)}
+                variant="outlined"
+                required
+                InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box sx={{ gridColumn: "1 / -1" }}>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Address <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Phone Number <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box sx={{ gridColumn: "1 / -1" }}>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Job Description <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
           </Box>
-          <Box sx={{ mt: "30px" }}>
-            <TextField
-              fullWidth
-              label="Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
-          </Box>
-          <Box sx={{ mt: "30px" }}>
-            <TextField
-              fullWidth
-              label="Phone Number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
-          </Box>
-
-          <Typography sx={{ mt: "30px", color: "#fff" }}>Job Status:</Typography>
+          <Typography sx={{ mt: 3, color: "#fff" }}>Job Status:</Typography>
           <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
             <Button variant="contained" sx={getStatusButtonStyle("Assigned")} onClick={() => setStatus("Assigned")}>
               Assigned
@@ -313,84 +611,146 @@ export default function JobsTable() {
             </Button>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: "#2c2c2c", color: "#fff" }}>
-          <Button onClick={() => setOpenModifyDialog(false)} sx={{ color: "#fff" }}>
+        <DialogActions sx={{ backgroundColor: "#1a1a1a", justifyContent: "flex-end", p: 2 }}>
+          <Button onClick={() => setOpenModifyDialog(false)} sx={{ color: "#ccc", mr: 1 }}>
             Cancel
           </Button>
-          <Button onClick={handleUpdateJob} sx={{ color: "#fff" }}>
+          <Button
+            onClick={handleUpdateJob}
+            sx={{
+              backgroundColor: "#d32f2f",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#b71c1c" },
+              borderRadius: 4,
+              px: 2,
+            }}
+          >
             Save Changes
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Create Job Dialog */}
       <Dialog
         open={openCreateDialog}
         onClose={() => setOpenCreateDialog(false)}
-        maxWidth="sm"
+        maxWidth="lg"
         fullWidth
-        PaperProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+        PaperProps={{ style: { backgroundColor: "#1a1a1a", color: "#fff" } }}
       >
-        <DialogTitle sx={{ mb: "10px", color: "#fff" }}>Create Job</DialogTitle>
-        <DialogContent sx={{ minHeight: "420px", pt: "10px", backgroundColor: "#2c2c2c", color: "#fff" }}>
-          <Box sx={{ mt: "15px" }}>
-            <TextField
-              fullWidth
-              label="Job Type"
-              value={jobType}
-              onChange={(e) => setJobType(e.target.value)}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
-          </Box>
-          <Box sx={{ mt: "15px" }}>
-            <Select
-              fullWidth
-              value={assignedTo}
-              onChange={(e) => {
-                setAssignedTo(e.target.value);
-                const selectedEmployee = employees.find(emp => emp.name === e.target.value);
-                setPhoneNumber(selectedEmployee?.phoneNumber || ""); // Auto-fill phone number
-              }}
-              variant="outlined"
-              displayEmpty
-              sx={{ color: "#fff", backgroundColor: "#1c1c1c", ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" } }}
-            >
-              <MenuItem value="" disabled>
-                Select Employee
-              </MenuItem>
-              {employees.map((employee) => (
-                <MenuItem key={employee.id} value={employee.name}>
-                  {employee.name}
+        <DialogTitle sx={{ mb: 1, color: "#fff", fontSize: "1.25rem" }}>Create Job</DialogTitle>
+        <DialogContent sx={{ pt: 2, backgroundColor: "#1a1a1a", color: "#fff" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mt: 2 }}>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Job Type <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                value={jobType}
+                onChange={(e) => setJobType(e.target.value)}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Assigned To <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <Select
+                fullWidth
+                value={assignedTo}
+                onChange={(e) => {
+                  setAssignedTo(e.target.value as string);
+                  const selectedEmployee = employees.find(emp => emp.name === e.target.value);
+                  setPhoneNumber(selectedEmployee?.phoneNumber || "");
+                }}
+                variant="outlined"
+                displayEmpty
+                required
+                sx={{
+                  backgroundColor: "#2c2c2c",
+                  ".MuiOutlinedInput-notchedOutline": { borderColor: "#555" },
+                  "& .MuiSelect-select": { color: "#fff" },
+                }}
+              >
+                <MenuItem value="" disabled>
+                  Select Employee
                 </MenuItem>
-              ))}
-            </Select>
+                {employees.map((employee) => (
+                  <MenuItem key={employee.id} value={employee.name}>
+                    {employee.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+            <Box sx={{ gridColumn: "1 / -1" }}>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Address <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Date <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                type="datetime-local"
+                value={dateTime || ""}
+                onChange={(e) => setDateTime(e.target.value)}
+                variant="outlined"
+                required
+                InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Phone Number <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
+            <Box sx={{ gridColumn: "1 / -1" }}>
+              <Typography sx={{ mb: 1, color: "#fff" }}>
+                Job Description <span style={{ color: "red" }}>*</span>
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                variant="outlined"
+                required
+                InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+              />
+            </Box>
           </Box>
-          <Box sx={{ mt: "15px" }}>
-            <TextField
-              fullWidth
-              label="Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
-          </Box>
-          <Box sx={{ mt: "15px" }}>
-            <TextField
-              fullWidth
-              label="Phone Number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
-              variant="outlined"
-              InputProps={{ style: { color: "#fff", backgroundColor: "#1c1c1c" } }}
-              InputLabelProps={{ style: { color: "#fff" } }}
-            />
-          </Box>
-
-          <Typography sx={{ mt: "15px", color: "#fff" }}>Job Status:</Typography>
+          <Typography sx={{ mt: 3, color: "#fff" }}>Job Status:</Typography>
           <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
             <Button variant="contained" sx={getStatusButtonStyle("Assigned")} onClick={() => setStatus("Assigned")}>
               Assigned
@@ -410,15 +770,79 @@ export default function JobsTable() {
             </Button>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: "#2c2c2c", color: "#fff" }}>
-          <Button onClick={() => setOpenCreateDialog(false)} sx={{ color: "#fff" }}>
+        <DialogActions sx={{ backgroundColor: "#1a1a1a", justifyContent: "flex-end", p: 2 }}>
+          <Button onClick={() => setOpenCreateDialog(false)} sx={{ color: "#ccc", mr: 1 }}>
             Cancel
           </Button>
-          <Button onClick={handleSubmitJob} sx={{ color: "#fff" }}>
+          <Button
+            onClick={handleSubmitJob}
+            sx={{
+              backgroundColor: "#d32f2f",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#b71c1c" },
+              borderRadius: 4,
+              px: 2,
+            }}
+          >
             Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Date Range Dialog */}
+      <Dialog
+        open={openDateRangeDialog}
+        onClose={() => setOpenDateRangeDialog(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ style: { backgroundColor: "#1a1a1a", color: "#fff" } }}
+      >
+        <DialogTitle sx={{ mb: 2, color: "#fff", fontSize: "1.25rem" }}>Select Date Range</DialogTitle>
+        <DialogContent sx={{ pt: 2, backgroundColor: "#1a1a1a", color: "#fff" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              variant="outlined"
+              InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
+              InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+              sx={{ mb: 2, "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+            />
+            <TextField
+              fullWidth
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              variant="outlined"
+              InputLabelProps={{ style: { color: "#fff" }, shrink: true }}
+              InputProps={{ style: { backgroundColor: "#2c2c2c", color: "#fff" } }}
+              sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" } }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ backgroundColor: "#1a1a1a", justifyContent: "flex-end", p: 2 }}>
+          <Button onClick={() => setOpenDateRangeDialog(false)} sx={{ color: "#ccc", mr: 1 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={exportToExcel}
+            sx={{
+              backgroundColor: "#d32f2f",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#b71c1c" },
+              borderRadius: 4,
+              px: 2,
+            }}
+          >
+            Export
           </Button>
         </DialogActions>
       </Dialog>
     </div>
   );
-}
+})), { ssr: false }); // Disable SSR for this component
+
+export default JobsTable;
